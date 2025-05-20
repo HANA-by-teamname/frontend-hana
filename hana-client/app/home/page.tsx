@@ -1,11 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import SignupCompleteModal from '@/components/SignupCompleteModal';
 import FooterNav from '@/components/FooterNav';
 import CampusMap from '@/components/CampusMapWrapper';
 import HomeHeader from '@/components/headers/HomeHeader';
+import withAuth from '@/hoc/withAuth';
 
 const todayClasses = [
   {
@@ -22,18 +23,11 @@ const todayClasses = [
   },
 ];
 
-export default function HomePage() {
-  const router = useRouter();
+function HomePage() {
   const searchParams = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [userName, setUserName] = useState<string | null>('이유정');
   const [school, setSchool] = useState<string | null>('중앙대학교');
-
-  useEffect(() => {
-    if (!userName || !school) {
-      router.push('/login');
-    }
-  }, [userName, school, router]);
 
   useEffect(() => {
     if (searchParams.get('joined') === 'true') {
@@ -46,15 +40,14 @@ export default function HomePage() {
     <main className="min-h-screen font-pretendard bg-gray-50 pb-24">
       {showModal && <SignupCompleteModal />}
 
-      {/* ✅ 분리된 헤더 사용 */}
+      {/* ✅ 헤더 */}
       <HomeHeader userName={userName!} school={school!} />
 
-      {/* 본문 */}
+      {/* ✅ 본문 */}
       <div className="w-full max-w-md mx-auto space-y-6 px-4 pt-6">
-
         {/* 학사일정 */}
         <section>
-          <h3 className="text-sm font-semibold mb-3 text-gray-700">  학사일정</h3>
+          <h3 className="text-sm font-semibold mb-3 text-gray-700">학사일정</h3>
           <div className="flex gap-3 overflow-x-auto pb-1">
             {[1, 2, 3].map((_, i) => (
               <div
@@ -70,7 +63,7 @@ export default function HomePage() {
 
         {/* 캠퍼스 지도 */}
         <section>
-          <h3 className="text-sm font-semibold mb-3 text-gray-700">  우리학교 지도</h3>
+          <h3 className="text-sm font-semibold mb-3 text-gray-700">우리학교 지도</h3>
           <div className="rounded-md overflow-hidden shadow">
             <CampusMap />
           </div>
@@ -78,7 +71,7 @@ export default function HomePage() {
 
         {/* 오늘 강의 */}
         <section className="space-y-2">
-          <h3 className="text-sm font-semibold mb-3 text-gray-700">  오늘 강의</h3>
+          <h3 className="text-sm font-semibold mb-3 text-gray-700">오늘 강의</h3>
           {todayClasses.map((cls, index) => (
             <div
               key={index}
@@ -96,7 +89,7 @@ export default function HomePage() {
 
         {/* 오늘의 학식 */}
         <section className="space-y-3">
-          <h3 className="text-sm font-semibold mb-3 text-gray-700">  오늘의 학식</h3>
+          <h3 className="text-sm font-semibold mb-3 text-gray-700">오늘의 학식</h3>
           {[{
             title: '310관 지하식당 점심',
             menu: '김치찌개, 순두부찌개, 치킨가스, 기름떡볶이, 두부무침, 잡채',
@@ -115,7 +108,10 @@ export default function HomePage() {
         </section>
       </div>
 
+      {/* ✅ 네비게이션 */}
       <FooterNav />
     </main>
   );
 }
+
+export default withAuth(HomePage);

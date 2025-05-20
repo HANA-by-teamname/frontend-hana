@@ -7,6 +7,7 @@ import Timetable from './Timetable';
 import AddSubjectModal from './AddSubjectModal';
 import Image from 'next/image';
 import FooterNav from '@/components/FooterNav';
+import MyPageHeader from '@/components/headers/MyPageHeader';
 
 export default function MyPage() {
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -20,7 +21,8 @@ export default function MyPage() {
 
   return (
     <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24 px-4">
-      <div className="w-full max-w-md mx-auto pt-6 space-y-6">
+     <MyPageHeader />
+    <div className="w-full max-w-md mx-auto pt-6 space-y-6">
         {/* 프로필 */}
         <section className="flex flex-col items-center gap-2">
           <ProfileUploader image={profileImage} onChange={setProfileImage} />

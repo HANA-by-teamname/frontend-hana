@@ -1,0 +1,40 @@
+'use client';
+
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+
+const navItems = [
+  { name: '홈', href: '/home', icon: 'Store.svg' },
+  { name: '검색', href: '/search', icon: 'Search.svg' },
+  { name: '찜', href: '/likes', icon: 'Heart Outlined.svg' },
+  { name: '채팅', href: '/chat', icon: 'Explore.svg' },
+  { name: '마이', href: '/mypage', icon: 'Profile.svg' },
+];
+
+export default function FooterNav() {
+  const pathname = usePathname();
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 w-full max-w-md mx-auto h-16 bg-white border-t border-gray-200 z-50 flex justify-around items-center">
+      {navItems.map((item) => {
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.name}
+            href={item.href}
+            className="flex flex-col items-center text-xs"
+          >
+            <img
+              src={`/icons/${item.icon}`}
+              alt={item.name}
+              className={`w-6 h-6 mb-1 ${isActive ? '' : 'grayscale opacity-50'}`}
+            />
+            <span className={isActive ? 'text-black font-semibold' : 'text-gray-400'}>
+              {item.name}
+            </span>
+          </Link>
+        );
+      })}
+    </nav>
+  );
+}

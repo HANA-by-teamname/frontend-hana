@@ -35,13 +35,15 @@ export async function login(email: string, password: string) {
 
 
 // 회원가입 함수
+// lib/api/auth.ts
+
 export async function signup(payload: {
   email: string;
   password: string;
-  nickname: string;
+  name: string;
   gender: 'male' | 'female';
   birthdate: string;
-  school: string;
+  faculty: string;  // ✅ 수정: school → faculty
   native_language: 'ko' | 'en' | 'zh' | 'ja' | 'vi';
   terms_agreement: boolean;
   privacy_agreement: boolean;
@@ -51,7 +53,7 @@ export async function signup(payload: {
   const res = await fetch(SIGNUP_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
+    body: JSON.stringify(payload), // faculty 포함됨
   });
 
   const text = await res.text();

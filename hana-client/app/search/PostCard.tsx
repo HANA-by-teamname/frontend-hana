@@ -1,7 +1,7 @@
 'use client';
 
 interface Post {
-  id: number;
+  id: string; // ✅ string으로 변경
   title: string;
   category: string;
   date: string;
@@ -11,7 +11,7 @@ interface Post {
 
 interface PostCardProps {
   post?: Post;
-  onToggleLike: (id: number) => void;
+  onToggleLike: (id: string) => void; // ✅ string으로 변경
   showLink?: boolean;
 }
 
@@ -20,16 +20,16 @@ export default function PostCard({ post, onToggleLike, showLink = false }: PostC
 
   return (
     <div className="bg-white rounded-xl shadow px-4 py-3">
-      <p className="text-xs text-gray-400 mb-1">{post?.category}</p>
-      <h3 className="text-sm font-semibold mb-2 leading-snug">{post?.title}</h3>
+      <p className="text-xs text-gray-400 mb-1">{post.category}</p>
+      <h3 className="text-sm font-semibold mb-2 leading-snug">{post.title}</h3>
       <div className="flex justify-between items-center text-xs text-gray-400 mb-2">
-        <span>{post?.date}</span>
-        <button onClick={() => post && onToggleLike(post.id)}>
-          {post?.liked ? '❤️' : '🤍'}
+        <span>{post.date}</span>
+        <button onClick={() => onToggleLike(post.id)}>
+          {post.liked ? '❤️' : '🤍'}
         </button>
       </div>
 
-      {showLink && post?.url && (
+      {showLink && post.url && (
         <a
           href={post.url}
           target="_blank"

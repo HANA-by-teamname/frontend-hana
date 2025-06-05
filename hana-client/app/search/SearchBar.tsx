@@ -3,7 +3,7 @@
 interface SearchBarProps {
   query: string;
   setQuery: (value: string) => void;
-  onSearchConfirm?: (value: string) => void; // ✅ 추가
+  onSearchConfirm?: (value: string) => void;
 }
 
 export default function SearchBar({ query, setQuery, onSearchConfirm }: SearchBarProps) {

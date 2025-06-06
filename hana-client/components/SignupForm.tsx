@@ -126,8 +126,8 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
         nickname,
         gender,
         birthdate,
-        faculty, // 단일 학부
-        data_sources: selectedDataSources, // 다중 선택
+        faculty,
+        data_sources: selectedDataSources,
         native_language: nativeLanguage,
         terms_agreement: termsAgreed,
         privacy_agreement: privacyAgreed,
@@ -147,6 +147,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
       <div className="w-full max-w-md">
         <h2 className="text font-bold text-center pt-8 mb-6">회원가입</h2>
 
+        {/* ✅ 이 부분만 하나의 <div className="space-y-5">로 묶음 */}
         <div className="space-y-5">
           <div>
             <label className="block text-xs py-1 text-gray-500 mb-1">이메일</label>
@@ -182,17 +183,17 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
           </div>
 
           <div>
-          <label className="block text-xs py-1 text-gray-700 mb-1">닉네임 / Nickname / 昵称</label>
-          <input
-            placeholder="ex. honggildong"
-            value={nickname}
-            onChange={(e) => setNickname(e.target.value)}
-            className="w-full border-b py-2 text-sm"
-          />
-          {nicknameCheckLoading && <p className="text-xs text-gray-400">확인 중...</p>}
-          {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}
-          {nicknameAvailable === true && <p className="text-xs text-green-500">사용 가능한 닉네임입니다.</p>}
-        </div>
+            <label className="block text-xs py-1 text-gray-700 mb-1">닉네임 / Nickname / 昵称</label>
+            <input
+              placeholder="ex. honggildong"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              className="w-full border-b py-2 text-sm"
+            />
+            {nicknameCheckLoading && <p className="text-xs text-gray-400">확인 중...</p>}
+            {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}
+            {nicknameAvailable === true && <p className="text-xs text-green-500">사용 가능한 닉네임입니다.</p>}
+          </div>
 
           <div>
             <label className="block text-xs py-1 text-gray-700 mb-1">성별 / Gender / 性别</label>
@@ -200,14 +201,14 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
               <button
                 type="button"
                 onClick={() => setGender('male')}
-                className={`flex-1 py-2 text-s py-1 border rounded transition ${gender === 'male' ? 'bg-gray-100' : ''}`}
+                className={`flex-1 py-2 text-s border rounded transition ${gender === 'male' ? 'bg-gray-100' : ''}`}
               >
                 남자 / Male / 男
               </button>
               <button
                 type="button"
                 onClick={() => setGender('female')}
-                className={`flex-1 py-2 text-s py-1 border rounded transition ${gender === 'female' ? 'bg-gray-100' : ''}`}
+                className={`flex-1 py-2 text-s border rounded transition ${gender === 'female' ? 'bg-gray-100' : ''}`}
               >
                 여자 / Female / 女
               </button>
@@ -225,29 +226,40 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
           </div>
 
           <div>
-            <label className="block py-1 text-xs text-gray-500 mb-1">학부 선택 / Select Faculty / 选择院系</label>
+            <label className="block text-xs py-1 text-gray-700 mb-1">학부 / Faculty</label>
+            <input
+              type="text"
+              placeholder="ex. 소프트웨어학부"
+              value={faculty}
+              onChange={(e) => setFaculty(e.target.value)}
+              className="w-full border-b py-2 text-sm"
+            />
+          </div>
+
+          <div>
+            <label className="block py-1 text-xs text-gray-500 mb-1"> 관심 정보 조회 / Select Data Sources</label>
             <div className="flex flex-wrap gap-2 mb-2">
               <button
                 type="button"
-                onClick={toggleAllFaculties}
+                onClick={toggleAllDataSources}
                 className={`px-3 py-1 rounded border text-sm transition ${
-                  allFacultiesSelected ? 'bg-gray-200 font-semibold' : 'bg-white'
+                  allDataSourcesSelected ? 'bg-gray-200 font-semibold' : 'bg-white'
                 }`}
               >
                 전체 선택 / Select All / 全选
               </button>
             </div>
             <div className="flex flex-wrap gap-2">
-              {faculties.map((faculty) => (
+              {faculties.map((f) => (
                 <button
-                  key={faculty}
+                  key={f}
                   type="button"
-                  onClick={() => toggleAllDataSources(data_sources)}
+                  onClick={() => toggleDataSource(f)}
                   className={`px-3 py-1 rounded border text-sm transition ${
-                    selectedFaculties.includes(faculty) ? 'bg-gray-200 font-semibold' : 'bg-white'
+                    selectedDataSources.includes(f) ? 'bg-gray-200 font-semibold' : 'bg-white'
                   }`}
                 >
-                  {faculty}
+                  {f}
                 </button>
               ))}
             </div>
@@ -310,5 +322,5 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
         </div>
       </div>
     </main>
-  );
-}
+    );
+  }

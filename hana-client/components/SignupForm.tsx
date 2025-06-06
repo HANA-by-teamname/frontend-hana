@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { signup } from '@/lib/api/auth';
 import { getFaculties } from '@/lib/api/getfaculty';
+import { checkNickname } from '@/lib/api/checknickname';
 
 interface SignupFormProps {
   presetEmail: string;
@@ -14,10 +15,16 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
   const router = useRouter();
 
   const [name, setName] = useState('');
+  const [nickname, setNickname] = useState('');
+  const [nicknameAvailable, setNicknameAvailable] = useState<boolean | null>(null);
+  const [nicknameCheckLoading, setNicknameCheckLoading] = useState(false);
+  const [nicknameError, setNicknameError] = useState('');
   const [gender, setGender] = useState<'male' | 'female' | ''>('');
   const [birthdate, setBirthdate] = useState('2002-11-09');
   const [faculties, setFaculties] = useState<string[]>([]);
-  const [selectedFaculty, setSelectedFaculty] = useState('');
+  const [faculty, setFaculty] = useState('');
+  const [selectedDataSources, setSelectedDataSources] = useState<string[]>([]);
+  const [allDataSourcesSelected, setAllDataSourcesSelected] = useState(false);
   const [nativeLanguage, setNativeLanguage] = useState<'ko' | 'en' | 'zh' | 'ja' | 'vi'>('ko');
   const [password, setPassword] = useState('');
   const [termsAgreed, setTermsAgreed] = useState(false);
@@ -33,9 +40,12 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
     presetEmail &&
     (isSocial || password) &&
     name &&
+    nickname &&
+    nicknameAvailable === true &&
     gender &&
     birthdate &&
-    selectedFaculty &&
+    faculty &&
+    selectedDataSources.length > 0 &&
     nativeLanguage &&
     termsAgreed &&
     privacyAgreed
@@ -44,6 +54,27 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
   useEffect(() => {
     getFaculties().then(setFaculties);
   }, []);
+
+  useEffect(() => {
+    const timeout = setTimeout(async () => {
+      if (!nickname) {
+        setNicknameAvailable(null);
+        return;
+      }
+      try {
+        setNicknameCheckLoading(true);
+        const exists = await checkNickname(nickname);
+        setNicknameAvailable(!exists);
+        setNicknameError(exists ? '이미 사용 중인 닉네임입니다.' : '');
+      } catch {
+        setNicknameAvailable(null);
+        setNicknameError('중복 확인 중 오류가 발생했습니다.');
+      } finally {
+        setNicknameCheckLoading(false);
+      }
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [nickname]);
 
   useEffect(() => {
     if (selectAll) {
@@ -59,6 +90,28 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
     }
   }, [selectAll]);
 
+  const toggleDataSource = (f: string) => {
+    if (selectedDataSources.includes(f)) {
+      const updated = selectedDataSources.filter(item => item !== f);
+      setSelectedDataSources(updated);
+      setAllDataSourcesSelected(false);
+    } else {
+      const updated = [...selectedDataSources, f];
+      setSelectedDataSources(updated);
+      if (updated.length === faculties.length) setAllDataSourcesSelected(true);
+    }
+  };
+
+  const toggleAllDataSources = () => {
+    if (allDataSourcesSelected) {
+      setSelectedDataSources([]);
+      setAllDataSourcesSelected(false);
+    } else {
+      setSelectedDataSources([...faculties]);
+      setAllDataSourcesSelected(true);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setError('');
@@ -70,9 +123,11 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
         email: presetEmail,
         password: passwordToSend,
         name,
+        nickname,
         gender,
         birthdate,
-        faculty: selectedFaculty,
+        faculty, // 단일 학부
+        data_sources: selectedDataSources, // 다중 선택
         native_language: nativeLanguage,
         terms_agreement: termsAgreed,
         privacy_agreement: privacyAgreed,
@@ -94,7 +149,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
 
         <div className="space-y-5">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">이메일</label>
+            <label className="block text-xs py-1 text-gray-500 mb-1">이메일</label>
             <input
               type="email"
               value={presetEmail}
@@ -105,7 +160,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
 
           {!isSocial && (
             <div>
-              <label className="block text-xs text-gray-700 mb-1">비밀번호 / Password / 密码</label>
+              <label className="block text-xs py-1 text-gray-700 mb-1">비밀번호 / Password / 密码</label>
               <input
                 type="password"
                 placeholder="비밀번호를 입력해주세요"
@@ -117,7 +172,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
           )}
 
           <div>
-            <label className="block text-xs text-gray-700 mb-1">이름 / Name / 姓名</label>
+            <label className="block text-xs py-1 text-gray-700 mb-1">이름 / Name / 姓名</label>
             <input
               placeholder="ex. 홍길동"
               value={name}
@@ -127,19 +182,32 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-700 mb-1">성별 / Gender / 性别</label>
+          <label className="block text-xs py-1 text-gray-700 mb-1">닉네임 / Nickname / 昵称</label>
+          <input
+            placeholder="ex. honggildong"
+            value={nickname}
+            onChange={(e) => setNickname(e.target.value)}
+            className="w-full border-b py-2 text-sm"
+          />
+          {nicknameCheckLoading && <p className="text-xs text-gray-400">확인 중...</p>}
+          {nicknameError && <p className="text-xs text-red-500">{nicknameError}</p>}
+          {nicknameAvailable === true && <p className="text-xs text-green-500">사용 가능한 닉네임입니다.</p>}
+        </div>
+
+          <div>
+            <label className="block text-xs py-1 text-gray-700 mb-1">성별 / Gender / 性别</label>
             <div className="flex space-x-4">
               <button
                 type="button"
                 onClick={() => setGender('male')}
-                className={`flex-1 py-2 text-s border rounded transition ${gender === 'male' ? 'bg-gray-100' : ''}`}
+                className={`flex-1 py-2 text-s py-1 border rounded transition ${gender === 'male' ? 'bg-gray-100' : ''}`}
               >
                 남자 / Male / 男
               </button>
               <button
                 type="button"
                 onClick={() => setGender('female')}
-                className={`flex-1 py-2 text-s border rounded transition ${gender === 'female' ? 'bg-gray-100' : ''}`}
+                className={`flex-1 py-2 text-s py-1 border rounded transition ${gender === 'female' ? 'bg-gray-100' : ''}`}
               >
                 여자 / Female / 女
               </button>
@@ -147,7 +215,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-500 mb-1">생년월일 / Birthdate / 出生日期</label>
+            <label className="block py-1 text-xs text-gray-500 mb-1">생년월일 / Birthdate / 出生日期</label>
             <input
               type="date"
               value={birthdate}
@@ -157,15 +225,26 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-500 mb-1">학부 선택 / Select Faculty / 选择院系</label>
+            <label className="block py-1 text-xs text-gray-500 mb-1">학부 선택 / Select Faculty / 选择院系</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              <button
+                type="button"
+                onClick={toggleAllFaculties}
+                className={`px-3 py-1 rounded border text-sm transition ${
+                  allFacultiesSelected ? 'bg-gray-200 font-semibold' : 'bg-white'
+                }`}
+              >
+                전체 선택 / Select All / 全选
+              </button>
+            </div>
             <div className="flex flex-wrap gap-2">
               {faculties.map((faculty) => (
                 <button
                   key={faculty}
                   type="button"
-                  onClick={() => setSelectedFaculty(faculty)}
+                  onClick={() => toggleAllDataSources(data_sources)}
                   className={`px-3 py-1 rounded border text-sm transition ${
-                    selectedFaculty === faculty ? 'bg-gray-200 font-semibold' : 'bg-white'
+                    selectedFaculties.includes(faculty) ? 'bg-gray-200 font-semibold' : 'bg-white'
                   }`}
                 >
                   {faculty}
@@ -175,7 +254,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
           </div>
 
           <div>
-            <label className="block text-xs text-gray-500 mb-1">자국어 / Native Language / 母语</label>
+            <label className="block text-xs py-1 text-gray-500 mb-1">자국어 / Native Language / 母语</label>
             <select
               value={nativeLanguage}
               onChange={(e) => setNativeLanguage(e.target.value as any)}
@@ -189,12 +268,12 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
             </select>
           </div>
 
-          <div className="text-sm pt-3">
-            <label className="block text-xs text-black mb-1">약관 동의 / Terms Agreement / 同意条款</label>
+          <div className="text-sm py-1 pt-3">
+            <label className="block text-xs text-black py-1 mb-1">약관 동의 / Terms Agreement / 同意条款</label>
             <span className="block text-xs text-gray-400 mb-2 cursor-pointer">약관 보러가기 &gt;</span>
             <label className="flex items-center space-x-3 mb-2">
               <input type="checkbox" checked={selectAll} onChange={(e) => setSelectAll(e.target.checked)} />
-              <span className='text-s text-blue-900'>전체 선택 / Select All / 全选</span>
+              <span className="text-s text-blue-900">전체 선택 / Select All / 全选</span>
             </label>
             <hr className="my-2 border-gray-200" />
             <div className="space-y-2">

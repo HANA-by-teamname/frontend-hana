@@ -1,7 +1,9 @@
 'use client';
 
+import Image from 'next/image';
+
 interface Post {
-  id: string; // ✅ string으로 변경
+  id: string;
   title: string;
   category: string;
   date: string;
@@ -11,7 +13,7 @@ interface Post {
 
 interface PostCardProps {
   post?: Post;
-  onToggleLike: (id: string) => void; // ✅ string으로 변경
+  onToggleLike: (id: string) => void;
   showLink?: boolean;
 }
 
@@ -19,13 +21,22 @@ export default function PostCard({ post, onToggleLike, showLink = false }: PostC
   if (!post) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow px-4 py-3">
-      <p className="text-xs text-gray-400 mb-1">{post.category}</p>
-      <h3 className="text-sm font-semibold mb-2 leading-snug">{post.title}</h3>
-      <div className="flex justify-between items-center text-xs text-gray-400 mb-2">
+    <div className="bg-white rounded-xl shadow px-4 py-4 space-y-2">
+      <p className="text-xs text-gray-400">{post.category}</p>
+      <h3 className="text-sm font-semibold leading-snug text-gray-900">{post.title}</h3>
+      <div className="flex justify-between items-center text-xs text-gray-400">
         <span>{post.date}</span>
-        <button onClick={() => onToggleLike(post.id)}>
-          {post.liked ? '❤️' : '🤍'}
+        <button
+          onClick={() => onToggleLike(post.id)}
+          aria-label="좋아요 버튼"
+          className="transition-transform hover:scale-110"
+        >
+          <Image
+            src={post.liked ? '/icons/Heart Filled.svg' : '/icons/Heart Outlined.svg'}
+            alt={post.liked ? '좋아요됨' : '좋아요 안됨'}
+            width={20}
+            height={20}
+          />
         </button>
       </div>
 

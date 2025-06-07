@@ -1,8 +1,26 @@
+// lib/api/auth.ts
+
 import {
   LOGIN_ENDPOINT,
   SIGNUP_ENDPOINT,
   CHECK_NICKNAME_ENDPOINT,
 } from '../constants';
+
+interface SignupPayload {
+  email: string;
+  password: string;
+  name: string;
+  nickname: string;
+  gender: 'male' | 'female';
+  birthdate: string;
+  faculty: string;
+  data_sources: string[];
+  native_language: 'ko' | 'en' | 'zh' | 'ja' | 'vi';
+  terms_agreement: boolean;
+  privacy_agreement: boolean;
+  marketing_agreement?: boolean;
+  third_party_agreement?: boolean;
+}
 
 export async function login(email: string, password: string) {
   const res = await fetch(LOGIN_ENDPOINT, {
@@ -23,7 +41,7 @@ export async function login(email: string, password: string) {
   }
 }
 
-export async function signup(payload: /* ... */) {
+export async function signup(payload: SignupPayload) {
   const res = await fetch(SIGNUP_ENDPOINT, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

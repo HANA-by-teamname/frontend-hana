@@ -6,10 +6,10 @@ import { useRouter } from 'next/navigation';
 
 interface HomeHeaderProps {
   userName: string;
-  school: string;
+  faculty: string;
 }
 
-export default function HomeHeader({ userName, school }: HomeHeaderProps) {
+export default function HomeHeader({ userName, faculty }: HomeHeaderProps) {
   const router = useRouter();
   const [translateOn, setTranslateOn] = useState(false);
 
@@ -23,15 +23,17 @@ export default function HomeHeader({ userName, school }: HomeHeaderProps) {
   }, [translateOn]);
 
   return (
-    <div className="w-full bg-white px-6 py-4 shadow-sm flex justify-between items-center">
-      <div>
-        <p className="text-sm text-[#4B4B4B]">
+    <div className="w-full px-4 py-4 bg-[#F9FAFB] shadow-sm flex items-center justify-between">
+      <div className="flex flex-col items-start text-left gap-0.5">
+        <p className="text-sm text-gray-600 tracking-tight">
           안녕하세요, <span className="font-semibold">{userName}</span>님!
         </p>
-        <h2 className="text-xl font-bold mt-1">{school}</h2>
+        <h2 className="text-lg font-bold text-gray-800 tracking-tight">
+          {faculty}
+        </h2>
       </div>
 
-      <div className="flex items-center gap-3">
+      <div className="flex items-center gap-2">
         <button
           onClick={() => setTranslateOn((prev) => !prev)}
           aria-label="번역 토글"
@@ -44,8 +46,8 @@ export default function HomeHeader({ userName, school }: HomeHeaderProps) {
                 : '/icons/translate_state=false.png'
             }
             alt="번역 토글"
-            width={32}
-            height={32}
+            width={28}
+            height={28}
           />
         </button>
 
@@ -56,7 +58,7 @@ export default function HomeHeader({ userName, school }: HomeHeaderProps) {
         >
           <Image
             src="/icons/notifications_active.png"
-            alt="Notification"
+            alt="알림 아이콘"
             width={24}
             height={24}
           />

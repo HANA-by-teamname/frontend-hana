@@ -6,7 +6,6 @@ import { usePathname } from 'next/navigation';
 const navItems = [
   { name: '홈', href: '/home', icon: 'Store.svg' },
   { name: '검색', href: '/search', icon: 'Search.svg' },
-  { name: '찜', href: '/likes', icon: 'Heart Outlined.svg' },
   { name: '채팅', href: '/chatbot', icon: 'Explore.svg' },
   { name: '마이', href: '/mypage', icon: 'Profile.svg' },
 ];

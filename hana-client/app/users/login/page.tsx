@@ -150,7 +150,7 @@ export default function LoginPage() {
                 다시 돌아가기
               </button>
               <button
-                onClick={() => router.push(`/users/signup?email=${encodeURIComponent(email)}`)}
+                onClick={() => router.push(`/signup?email=${encodeURIComponent(email)}`)}
                 className="flex-1 py-2 bg-sky-500 text-white rounded-md font-bold"
               >
                 회원가입하러 가기

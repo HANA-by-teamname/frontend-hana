@@ -51,18 +51,6 @@ export default function HomeHeader({ userName, faculty }: HomeHeaderProps) {
           />
         </button>
 
-        <button
-          onClick={() => router.push('/notifications')}
-          aria-label="알림 보기"
-          className="p-1"
-        >
-          <Image
-            src="/icons/notifications_active.png"
-            alt="알림 아이콘"
-            width={24}
-            height={24}
-          />
-        </button>
       </div>
     </div>
   );

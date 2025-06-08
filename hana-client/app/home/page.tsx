@@ -7,6 +7,8 @@ import FooterNav from '@/components/FooterNav';
 import CampusMap from '@/components/CampusMapWrapper';
 import HomeHeader from '@/components/headers/HomeHeader';
 import withAuth from '@/hoc/withAuth';
+import { academicSchedules } from '@/lib/data/academicSchedules';
+import { format, isWithinInterval, parseISO, isAfter, isToday } from 'date-fns';
 
 const todayClasses = [
   {
@@ -29,6 +31,11 @@ function HomePage() {
   const [userName, setUserName] = useState<string | null>(null);
   const [faculty, setFaculty] = useState<string | null>(null);
 
+  const today = new Date();
+  const upcomingSchedules = academicSchedules
+    .filter(s => isAfter(parseISO(s.end), today) || isToday(parseISO(s.end)))
+    .slice(0, 5);
+
   useEffect(() => {
     const fetchUserInfo = async () => {
       const token = localStorage.getItem('token');
@@ -42,7 +49,6 @@ function HomePage() {
         });
 
         if (!res.ok) throw new Error('응답 오류');
-
         const data = await res.json();
         setUserName(data.nickname);
         setFaculty(data.faculty);
@@ -63,7 +69,6 @@ function HomePage() {
     <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24">
       {showModal && <SignupCompleteModal />}
 
-      {/* ✅ 헤더 */}
       {userName && faculty && (
         <div className="w-full flex justify-center pt-[24px]">
           <div className="w-full max-w-[360px] px-4">
@@ -72,24 +77,38 @@ function HomePage() {
         </div>
       )}
 
-      {/* ✅ 본문 */}
       <div className="w-full flex justify-center">
         <div className="w-full max-w-[360px] space-y-6 px-4 pt-6 leading-[1.5]">
+          
+          {/* ✅ 학사일정 섹션 */}
           <section>
             <h3 className="text-sm font-semibold mb-3 text-gray-700">학사일정</h3>
             <div className="flex gap-3 overflow-x-auto pb-1">
-              {[1, 2, 3].map((_, i) => (
-                <div
-                  key={i}
-                  className="flex-shrink-0 bg-sky-50 border border-sky-200 rounded-lg px-4 py-3 shadow-sm text-sm"
-                >
-                  <p className="text-black font-semibold">수강신청 정정기간</p>
-                  <p className="text-xs text-gray-500">03.20 ~ 03.21</p>
-                </div>
-              ))}
+              {upcomingSchedules.map((schedule, i) => {
+                const start = parseISO(schedule.start);
+                const end = parseISO(schedule.end);
+                const includesToday = isWithinInterval(today, { start, end });
+
+                return (
+                  <div
+                    key={i}
+                    className={`flex-shrink-0 w-[120px] h-[160px] rounded-xl p-4 shadow-sm border text-sm
+                      ${includesToday
+                        ? 'bg-blue-100 border-blue-400 text-blue-800 font-semibold'
+                        : 'bg-gray-100 border-gray-200 text-gray-700'}
+                    `}
+                  >
+                    <p className="mb-2">{schedule.title}</p>
+                    <p className="text-xs font-medium text-gray-500">
+                      {format(start, 'MM.dd')} ~ {format(end, 'MM.dd')}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
           </section>
 
+          {/* ✅ 지도 */}
           <section>
             <h3 className="text-sm font-semibold mb-3 text-gray-700">우리학교 지도</h3>
             <div className="rounded-md overflow-hidden shadow">
@@ -97,6 +116,7 @@ function HomePage() {
             </div>
           </section>
 
+          {/* ✅ 오늘 강의 */}
           <section className="space-y-2">
             <h3 className="text-sm font-semibold mb-3 text-gray-700">오늘 강의</h3>
             {todayClasses.map((cls, index) => (
@@ -114,6 +134,7 @@ function HomePage() {
             ))}
           </section>
 
+          {/* ✅ 학식 */}
           <section className="space-y-3">
             <h3 className="text-sm font-semibold mb-3 text-gray-700">오늘의 학식</h3>
             {[{

@@ -13,7 +13,7 @@ export default function Home() {
       if (token) {
         router.push('/home'); // 로그인 되어있으면 대시보드로
       } else {
-        router.push('/auth/login'); // 아니면 로그인으로
+        router.push('/users/login'); // 아니면 로그인으로
       }
     }, 5000);
 

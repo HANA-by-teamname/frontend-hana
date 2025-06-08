@@ -14,62 +14,75 @@ interface Message {
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'bot', content: '안녕하세요! 무엇이 궁금하신가요?' },
+    { role: 'bot', content: '반가워요!' },
   ]);
   const [input, setInput] = useState('');
   const bottomRef = useRef<HTMLDivElement>(null);
 
+  const sendMessage = (content: string) => {
+    const trimmed = content.trim();
+    if (!trimmed) return;
+
+    const lastMessage = messages[messages.length - 1];
+    if (lastMessage?.role === 'user' && lastMessage.content === trimmed) return;
+
+    const userMessage: Message = { role: 'user', content: trimmed };
+    const isPrepared = true; // ✅ 답변 준비 상태
+
+    if (isPrepared) {
+      const botReply: Message = {
+        role: 'bot',
+        content: `"${trimmed}"에 대한 답변은 준비됐어요!`, // ✅ 절대 undefined 없음
+      };
+      setMessages((prev) => [...prev, userMessage, botReply]);
+    } else {
+      setMessages((prev) => [...prev, userMessage]);
+    }
+  };
+
   const handleSend = () => {
-    if (!input.trim()) return;
+    const trimmed = input.trim();
+    if (!trimmed) return;
 
-    const userMessage: Message = { role: 'user', content: input };
-    const botReply: Message = {
-      role: 'bot',
-      content: `"${input}"에 대한 답변은 준비 중이에요.`,
-    };
-
-    setMessages((prev) => [...prev, userMessage, botReply]);
-    setInput('');
+    setInput('');           // ✅ 2. 먼저 입력창 초기화
+    sendMessage(trimmed);   // ✅ 2. 그 다음 메시지 처리
   };
 
   const handleSuggestion = (text: string) => {
-    setInput(text);
+    setInput('');
+    sendMessage(text);
   };
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+    bottomRef.current?.scrollIntoView({ behavior: 'auto' });
   }, [messages]);
 
   return (
-    <main className="min-h-screen bg-white font-pretendard flex justify-center px-4 pb-36">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-md flex flex-col h-screen relative">
-        {/* Header - 항상 상단에 */}
-        <div className="px-4 pt-6 pb-2">
-          <ChatHeader />
-        </div>
-
-        {/* 메시지 영역 (스크롤 지원) */}
-        <div className="flex-1 overflow-y-auto px-4 space-y-3">
+    <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-24">
+      <div className="w-full max-w-md mx-auto px-4 pt-6 space-y-4">
+        <ChatHeader />
+        <div className="space-y-2">
           {messages.map((msg, i) => (
             <ChatBubble key={i} role={msg.role} content={msg.content} />
           ))}
           <div ref={bottomRef} />
-          {messages.length === 1 && (
-            <div className="mt-2">
-              <ChatSuggestions onSelect={handleSuggestion} />
-            </div>
-          )}
         </div>
 
-        {/* 입력창 */}
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full max-w-md px-4">
+        {messages.length === 1 && (
+          <div className="mt-2">
+            <ChatSuggestions onSelect={handleSuggestion} />
+          </div>
+        )}
+      </div>
+
+      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full px-4">
+        <div className="max-w-md mx-auto w-full">
           <ChatInput value={input} onChange={setInput} onSend={handleSend} />
         </div>
+      </div>
 
-        {/* FooterNav */}
-        <div className="absolute bottom-0 w-full">
-          <FooterNav />
-        </div>
+      <div className="fixed bottom-0 w-full">
+        <FooterNav />
       </div>
     </main>
   );

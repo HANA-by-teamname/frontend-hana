@@ -19,6 +19,8 @@ const UserContext = createContext<UserContextType>({
   loading: true,
 });
 
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -27,9 +29,10 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch('/users/me', {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await fetch(`${API_BASE_URL}/users/me`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
 
         if (!res.ok) throw new Error('사용자 정보 요청 실패');
 

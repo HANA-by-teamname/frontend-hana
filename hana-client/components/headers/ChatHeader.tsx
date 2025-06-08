@@ -60,14 +60,14 @@ export default function ChatHeader() {
 
   return (
     <>
-      <div className="w-full px-6 py-4 shadow-sm flex items-center justify-between bg-white">
+      <div className="w-full px-6 py-4 shadow-sm flex items-center justify-between bg-[#F9FAFB]">
         <div>
           <h2 className="text-lg font-semibold text-gray-800 mb-1">챗봇</h2>
           <p className="text-sm text-gray-500">
             {loading
               ? '사용자 정보를 불러오는 중입니다...'
               : defaultLang
-              ? '무엇이 궁금하신가요?'
+              ? '학교 관련 질문이라면 무엇이든! 똑똑한 하나봇'
               : '사용자 정보를 찾을 수 없습니다.'}
           </p>
         </div>

@@ -147,7 +147,6 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
       <div className="w-full max-w-md">
         <h2 className="text font-bold text-center pt-8 mb-6">회원가입</h2>
 
-        {/* ✅ 이 부분만 하나의 <div className="space-y-5">로 묶음 */}
         <div className="space-y-5">
           <div>
             <label className="block text-xs py-1 text-gray-500 mb-1">이메일</label>
@@ -157,6 +156,11 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
               readOnly
               className="w-full border-b py-2 text-sm text-gray-400 bg-gray-50 cursor-not-allowed"
             />
+            {isSocial && (
+              <p className="text-xs text-gray-500 mt-1">
+                소셜 계정으로 가입 중입니다. 비밀번호 입력은 생략됩니다.
+              </p>
+            )}
           </div>
 
           {!isSocial && (

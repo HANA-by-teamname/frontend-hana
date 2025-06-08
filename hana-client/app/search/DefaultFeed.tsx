@@ -28,38 +28,38 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
 
   useEffect(() => {
-  const fetchInitial = async () => {
-    if (!token) {
-      alert('다시 로그인해주세요!');
-      window.location.href = '/login';
-      return;
-    }
-
-    try {
-      const facultyList = await getFaculties();
-      setAllFaculties(facultyList);
-
-      const resUser = await fetch(USER_ME_ENDPOINT, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      if (resUser.status === 403 || resUser.status === 401) {
+    const fetchInitial = async () => {
+      if (!token) {
         alert('다시 로그인해주세요!');
-        localStorage.removeItem('token');
         window.location.href = '/login';
         return;
       }
 
-      const userData = await resUser.json();
-      setSelectedFaculties(userData.data_sources || []);
-    } catch (err) {
-      alert('다시 로그인해주세요!');
-      window.location.href = '/login';
-    }
-  };
+      try {
+        const facultyList = await getFaculties();
+        setAllFaculties(facultyList);
 
-  fetchInitial();
-}, []);
+        const resUser = await fetch(USER_ME_ENDPOINT, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (resUser.status === 403 || resUser.status === 401) {
+          alert('다시 로그인해주세요!');
+          localStorage.removeItem('token');
+          window.location.href = '/login';
+          return;
+        }
+
+        const userData = await resUser.json();
+        setSelectedFaculties(userData.data_sources || []);
+      } catch (err) {
+        alert('다시 로그인해주세요!');
+        window.location.href = '/login';
+      }
+    };
+
+    fetchInitial();
+  }, []);
 
   useEffect(() => {
     const fetchFeed = async () => {
@@ -100,11 +100,30 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
     }
   }, [selectedFaculties]);
 
-  const handleFacultyToggle = (faculty: string) => {
+  const handleFacultyToggle = async (faculty: string) => {
     const updated = selectedFaculties.includes(faculty)
       ? selectedFaculties.filter((f) => f !== faculty)
       : [...selectedFaculties, faculty];
+
     setSelectedFaculties(updated);
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/update-faculty`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ data_sources: updated }),
+      });
+
+      if (!res.ok) {
+        throw new Error('서버 응답 실패');
+      }
+    } catch (err) {
+      console.error('❌ 필터 DB 업데이트 실패:', err);
+      alert('서버에 필터 설정 저장 중 오류가 발생했어요.');
+    }
   };
 
   return (

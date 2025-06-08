@@ -54,7 +54,7 @@ export default function MyPage() {
   };
 
   return (
-    <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24 px-4">
+    <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24 px-4 pt-6">
       <MyPageHeader />
       <div className="w-full max-w-md mx-auto pt-6 space-y-6">
         {/* 프로필 */}
@@ -82,7 +82,7 @@ export default function MyPage() {
               </button>
             </div>
           </div>
-          <p><Timetable subjects={subjects} /></p>
+          <Timetable subjects={subjects} />
         </section>
       </div>
 

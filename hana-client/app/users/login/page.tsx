@@ -2,17 +2,18 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { login } from '@/lib/api/auth'; // 자동 signup 제거
+import { login } from '@/lib/api/auth';
 
 export default function LoginPage() {
+  const router = useRouter();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(true);
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
   const [generalError, setGeneralError] = useState('');
-  const [showSignupConfirm, setShowSignupConfirm] = useState(false); // ✅ 모달 제어용
-  const router = useRouter();
+  const [showSignupConfirm, setShowSignupConfirm] = useState(false);
 
   const handleLogin = async () => {
     setEmailError('');
@@ -25,12 +26,10 @@ export default function LoginPage() {
       setEmailError('* 이메일을 입력해주세요');
       hasError = true;
     }
-
     if (!password) {
       setPasswordError('* 비밀번호를 입력해주세요');
       hasError = true;
     }
-
     if (hasError) return;
 
     const result = await login(email, password);
@@ -39,17 +38,31 @@ export default function LoginPage() {
       localStorage.setItem('token', result.token);
       router.push('/home');
     } else if (result.reason === 'not_found') {
-      // ✅ 자동 회원가입 X, 모달 띄움
       setShowSignupConfirm(true);
     } else {
       setGeneralError('로그인 실패: 이메일 또는 비밀번호를 확인해주세요.');
     }
   };
 
+  const handleKakaoLogin = () => {
+    const kakaoClientId = process.env.NEXT_PUBLIC_KAKAO_CLIENT_ID!;
+    const kakaoRedirectUri = process.env.NEXT_PUBLIC_KAKAO_REDIRECT_URI!;
+    const kakaoAuthURL = `https://kauth.kakao.com/oauth/authorize?response_type=code&client_id=${kakaoClientId}&redirect_uri=${kakaoRedirectUri}`;
+    window.location.href = kakaoAuthURL;
+  };
+
+  const handleGoogleLogin = () => {
+    const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!;
+    const googleRedirectUri = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URI!;
+    const scope = 'openid email profile';
+    const googleAuthURL = `https://accounts.google.com/o/oauth2/v2/auth?response_type=code&client_id=${googleClientId}&redirect_uri=${googleRedirectUri}&scope=${encodeURIComponent(scope)}`;
+    window.location.href = googleAuthURL;
+  };
+
   return (
     <main className="min-h-screen bg-white flex flex-col justify-center items-center font-pretendard">
       <div className="w-full max-w-[390px] px-6 py-8 space-y-4">
-        {/* 로고 및 안내 문구 */}
+        {/* 로고 */}
         <div className="text-center pt-6">
           <h1 className="text-5xl font-black text-sky-500 drop-shadow">HANA</h1>
           <p className="text-sm text-gray-500 mt-2">하나로 행복해진 하나뿐인 유학생활</p>
@@ -92,9 +105,7 @@ export default function LoginPage() {
             <span>로그인 상태 유지</span>
           </label>
 
-          {generalError && (
-            <p className="text-red-500 text-sm mt-2">{generalError}</p>
-          )}
+          {generalError && <p className="text-red-500 text-sm mt-2">{generalError}</p>}
 
           <button
             type="button"
@@ -107,14 +118,14 @@ export default function LoginPage() {
           <div className="mt-6 space-y-3">
             <button
               type="button"
-              onClick={() => router.push('/auth/callback/kakao')}
+              onClick={handleKakaoLogin}
               className="w-full bg-yellow-300 py-2 rounded-md font-bold text-black"
             >
               카카오톡으로 쉬운 시작
             </button>
             <button
               type="button"
-              onClick={() => router.push('/auth/callback/google')}
+              onClick={handleGoogleLogin}
               className="w-full bg-gray-100 py-2 rounded-md font-bold text-black"
             >
               구글 계정으로 쉬운 시작
@@ -123,12 +134,14 @@ export default function LoginPage() {
         </div>
       </div>
 
-      {/* ✅ 회원가입 유도 모달 */}
+      {/* 회원가입 유도 모달 */}
       {showSignupConfirm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg w-80 text-center shadow-lg">
             <h2 className="text-lg font-bold mb-4">회원가입 안내</h2>
-            <p className="text-sm mb-6"> 계정이 존재하지 않아요.<br />회원가입하시겠어요?</p>
+            <p className="text-sm mb-6">
+              계정이 존재하지 않아요.<br />회원가입하시겠어요?
+            </p>
             <div className="flex justify-between gap-2">
               <button
                 onClick={() => setShowSignupConfirm(false)}
@@ -137,7 +150,7 @@ export default function LoginPage() {
                 다시 돌아가기
               </button>
               <button
-                onClick={() => router.push(`/auth/signup?email=${encodeURIComponent(email)}`)} // ✅ 여기!
+                onClick={() => router.push(`/users/signup?email=${encodeURIComponent(email)}`)}
                 className="flex-1 py-2 bg-sky-500 text-white rounded-md font-bold"
               >
                 회원가입하러 가기

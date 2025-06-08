@@ -5,5 +5,8 @@
     "leaflet": "^1.9.4",
     "lucide-react": "^0.513.0",
     "react-leaflet": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/axios": "^0.9.36"
   }
 }

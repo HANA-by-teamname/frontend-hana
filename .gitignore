@@ -1,8 +1,14 @@
-# hana-clean/.gitignore 또는 hana_frontend/.gitignore
+# dependencies
 node_modules/
-.next/
-out/
-.env*
+
+# production
+dist/
+.build/
+
+# misc
 .DS_Store
-.vscode/
- 
+.env
+.env.*.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

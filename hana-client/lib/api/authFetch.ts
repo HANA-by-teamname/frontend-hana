@@ -1,7 +1,8 @@
 // lib/api/authFetch.ts
 import { getSessionModalInstance } from '@/lib/sessionModalInstance';
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
+// authFetch.ts
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 export async function authFetch(path: string, options: RequestInit = {}) {
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;

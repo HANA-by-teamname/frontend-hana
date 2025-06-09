@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
 import ChatLanguageModal from '@/components/modals/ChatLanguageModal';
+import { authFetch } from '@/lib/api/authFetch';
 
 export default function ChatHeader() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -15,11 +16,7 @@ export default function ChatHeader() {
         const token = localStorage.getItem('token');
         if (!token) throw new Error('토큰 없음');
 
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        const res = await authFetch('/users/me');
 
         if (!res.ok) throw new Error(`응답 실패: ${res.status}`);
 
@@ -40,14 +37,7 @@ export default function ChatHeader() {
   const handleLangChange = async (newLang: string) => {
     try {
       const token = localStorage.getItem('token');
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/lang`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ language: newLang }),
-      });
+      const res = await authFetch('/users/lang');
 
       if (!res.ok) throw new Error('❌ 언어 변경 실패');
 

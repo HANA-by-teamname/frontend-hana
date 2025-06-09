@@ -19,7 +19,7 @@ export default function GoogleCallbackPage() {
     const fetchGoogleUser = async () => {
       try {
         setStatusMessage('구글 계정 인증 중...');
-        const res = await fetch(`http://localhost:4000/users/social/google?code=${code}`);
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/social/google?code=${code}`);
         const data = await res.json();
 
         if (data.success && data.token) {

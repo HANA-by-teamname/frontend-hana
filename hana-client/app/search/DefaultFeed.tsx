@@ -94,7 +94,7 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
     setSelectedFaculties(updated);
 
     try {
-      await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/users/update-faculty`, {
+      await authFetch('/users/update-faculty', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
@@ -131,7 +131,7 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
       {/* 게시글 렌더링 */}
       <div className="flex flex-col space-y-4 min-h-[300px]">
         {isLoading ? (
-          <p className="text-center text-sm text-gray-400">피드를 불러오는 중...</p>
+          <p className="text-center py-6 text-sm text-gray-400">피드를 불러오고 있어요...</p>
         ) : posts.length > 0 ? (
           posts.map((post) => (
             <PostCard key={post.id} post={post} onToggleLike={() => toggleLike(post.id)} showLink />

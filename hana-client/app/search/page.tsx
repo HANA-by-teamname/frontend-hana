@@ -7,7 +7,8 @@ import FooterNav from '@/components/FooterNav';
 import DefaultFeed from './DefaultFeed';
 import SearchView from './SearchView';
 import { getFaculties } from '@/lib/api/getfaculty';
-import { USER_ME_ENDPOINT } from '@/lib/constants';
+import { authFetch } from '@/lib/api/authFetch';
+import { USER_ME_ENDPOINT, SEARCH_FEED_ENDPOINT } from '@/lib/constants';
 import SessionExpiredModal from '@/components/modals/SessionExpiredModal';
 import { addFavorite, deleteFavorite } from '@/lib/api/favorite';
 
@@ -33,18 +34,13 @@ export default function Page() {
   const [selectedFaculties, setSelectedFaculties] = useState<string[]>([]);
   const [showSessionExpired, setShowSessionExpired] = useState(false);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
-
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
         const facultyList = await getFaculties();
         setAllFaculties(facultyList);
 
-        const resUser = await fetch(USER_ME_ENDPOINT, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
+        const resUser = await authFetch(USER_ME_ENDPOINT);
         if (resUser.status === 401 || resUser.status === 403) {
           setShowSessionExpired(true);
           return;
@@ -64,12 +60,8 @@ export default function Page() {
   const fetchPostsFromAPI = async (keyword: string, sort: '정확도순' | '최신순' | '인기순') => {
     try {
       setIsLoading(true);
-      const res = await fetch('http://localhost:4000/feeds/search', {
+      const res = await authFetch(SEARCH_FEED_ENDPOINT, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ keyword, faculty: selectedFaculties, sort }),
       });
 
@@ -101,23 +93,23 @@ export default function Page() {
   const toggleLike = async (id: string) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
     const targetPost = posts.find((post) => post.id === id);
-    if (!token || !targetPost) return;
+    if (!targetPost) return;
 
-    // 1. 프론트 상태 먼저 바꿈 (optimistic UI)
+    // 1. optimistic update
     setPosts((prev) =>
       prev.map((post) => (post.id === id ? { ...post, liked: !post.liked } : post))
     );
 
-    // 2. 서버에 좋아요 상태 저장
+    // 2. 서버 전송
     try {
       if (targetPost.liked) {
-        await deleteFavorite(id, token); // 기존에 true → 해제
+        await deleteFavorite(id, token); // 해제
       } else {
-        await addFavorite(id, token); // 기존에 false → 추가
+        await addFavorite(id, token); // 추가
       }
     } catch (err) {
       console.error('좋아요 API 호출 실패:', err);
-      // 3. 실패 시 프론트 상태 되돌리기
+      // 3. 실패 시 복원
       setPosts((prev) =>
         prev.map((post) => (post.id === id ? { ...post, liked: targetPost.liked } : post))
       );
@@ -162,7 +154,6 @@ export default function Page() {
               recommendedKeywords={recommendedKeywords}
               recent={recent}
               setRecent={setRecent}
-              token={token}
               selectedFaculties={selectedFaculties}
               setPosts={setPosts}
               posts={posts}
@@ -176,7 +167,6 @@ export default function Page() {
         </div>
       </main>
 
-      {/* ✅ 검색 중이 아닐 때만 FooterNav 표시 */}
       {!isSearching && <FooterNav />}
 
       <SessionExpiredModal

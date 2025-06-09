@@ -9,6 +9,8 @@ import HomeHeader from '@/components/headers/HomeHeader';
 import withAuth from '@/hoc/withAuth';
 import { academicSchedules } from '@/lib/data/academicSchedules';
 import { format, isWithinInterval, parseISO, isAfter, isToday } from 'date-fns';
+import { authFetch } from '@/lib/api/authFetch';
+import { USER_ME_ENDPOINT } from '@/lib/constants';
 
 const todayClasses = [
   {
@@ -25,7 +27,7 @@ const todayClasses = [
   },
 ];
 
-function HomePage() {
+  function HomePage() {
   const searchParams = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
@@ -37,33 +39,29 @@ function HomePage() {
     .slice(0, 5);
 
   useEffect(() => {
-    const fetchUserInfo = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
+  const fetchUserInfo = async () => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
 
-      try {
-        const res = await fetch('http://localhost:4000/users/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+    try {
+      const res = await authFetch(USER_ME_ENDPOINT);
+      if (!res.ok) throw new Error('응답 오류');
 
-        if (!res.ok) throw new Error('응답 오류');
-        const data = await res.json();
-        setUserName(data.nickname);
-        setFaculty(data.faculty);
-      } catch (err) {
-        console.error('사용자 정보 로딩 실패:', err);
-      }
-    };
-
-    fetchUserInfo();
-
-    if (searchParams.get('joined') === 'true') {
-      setShowModal(true);
-      setTimeout(() => setShowModal(false), 3000);
+      const data = await res.json();
+      setUserName(data.nickname);
+      setFaculty(data.faculty);
+    } catch (err) {
+      console.error('사용자 정보 로딩 실패:', err);
     }
-  }, [searchParams]);
+  };
+
+  fetchUserInfo();
+
+  if (searchParams.get('joined') === 'true') {
+    setShowModal(true);
+    setTimeout(() => setShowModal(false), 3000);
+  }
+}, [searchParams]); // ✅ useEffect 닫힘
 
   return (
     <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24">

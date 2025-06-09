@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import PostCard from './PostCard';
 import Image from 'next/image';
+import { authFetch } from '@/lib/api/authFetch';
+import { FACULTIES_ENDPOINT } from '@/lib/constants';
 
 interface Post {
   id: string;
@@ -23,9 +25,8 @@ interface SearchViewProps {
   recommendedKeywords: string[];
   recent: string[];
   setRecent: (prev: string[]) => void;
-  token: string;
   selectedFaculties: string[];
-  setSelectedFaculties?: (list: string[]) => void; // ✅ 추가
+  setSelectedFaculties?: (list: string[]) => void;
   setPosts: (posts: Post[]) => void;
   posts: Post[];
   isLoading: boolean;
@@ -43,7 +44,6 @@ export default function SearchView({
   recommendedKeywords,
   recent,
   setRecent,
-  token,
   selectedFaculties,
   setSelectedFaculties,
   setPosts,
@@ -56,21 +56,25 @@ export default function SearchView({
 
   useEffect(() => {
     const fetchFaculties = async () => {
-      const res = await fetch('/api/faculties');
-      const list = await res.json();
-      setAllFaculties(list);
+      try {
+        // 공개 API일 경우 이대로 사용 가능
+        const res = await fetch('/api/faculties');
+        // 보호된 백엔드일 경우 아래로 교체
+        // const res = await authFetch(FACULTIES_ENDPOINT);
+        const list = await res.json();
+        setAllFaculties(list);
+      } catch (err) {
+        console.error('학부 목록 불러오기 실패:', err);
+      }
     };
+
     fetchFaculties();
   }, []);
 
   const updateUserFaculties = async (newList: string[]) => {
     try {
-      await fetch('/users/update-faculty', {
+      await authFetch('/users/update-faculty', {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
         body: JSON.stringify({ data_sources: newList }),
       });
     } catch (err) {
@@ -131,8 +135,9 @@ export default function SearchView({
         <select
           value={sortType}
           onChange={(e) => {
-            setSortType(e.target.value as any);
-            fetchPostsFromAPI(query, e.target.value as any);
+            const newSort = e.target.value as '정확도순' | '최신순' | '인기순';
+            setSortType(newSort);
+            fetchPostsFromAPI(query, newSort);
           }}
           className="text-xs border border-gray-300 rounded px-2 py-1 bg-white"
         >

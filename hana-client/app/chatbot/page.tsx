@@ -6,6 +6,8 @@ import ChatBubble from '@/components/chat/ChatBubble';
 import ChatSuggestions from '@/components/chat/ChatSuggestion';
 import FooterNav from '@/components/FooterNav';
 import ChatHeader from '@/components/headers/ChatHeader';
+import SessionExpiredModal from '@/components/modals/SessionExpiredModal';
+import { authFetch } from '@/lib/api/authFetch';
 
 interface Message {
   role: 'user' | 'bot';
@@ -15,9 +17,20 @@ interface Message {
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
+  const [showSessionExpired, setShowSessionExpired] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const checkToken = async () => {
+      try {
+        const res = await authFetch('/users/me');
+        if (!res.ok) throw new Error('세션 없음');
+      } catch (err) {
+        console.error('❌ 인증 실패:', err);
+        setShowSessionExpired(true);
+      }
+    };
+    checkToken();
     setMessages([{ role: 'bot', content: '반가워요!' }]);
   }, []);
 
@@ -38,8 +51,8 @@ export default function ChatPage() {
     const trimmed = input.trim();
     if (!trimmed) return;
 
-    setInput('');            // ✅ 입력 먼저 비우고
-    sendMessage(trimmed);    // ✅ 안전하게 복사한 값 넘김
+    setInput('');
+    sendMessage(trimmed);
   };
 
   const handleSuggestion = (text: string) => {
@@ -53,9 +66,9 @@ export default function ChatPage() {
 
   return (
     <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-24">
-      <div className="w-full max-w-md mx-auto px-4 pt-6 space-y-4"> {/* ✅ 간격 2배 */}
+      <div className="w-full max-w-md mx-auto px-4 pt-6 space-y-4">
         <ChatHeader />
-        <div className="space-y-4"> {/* ✅ 채팅 간 간격 늘림 */}
+        <div className="space-y-4">
           {messages.map((msg, i) => (
             <ChatBubble key={i} role={msg.role} content={msg.content} />
           ))}
@@ -77,6 +90,11 @@ export default function ChatPage() {
       <div className="fixed bottom-0 w-full">
         <FooterNav />
       </div>
+
+      <SessionExpiredModal
+        visible={showSessionExpired}
+        onClose={() => setShowSessionExpired(false)}
+      />
     </main>
   );
 }

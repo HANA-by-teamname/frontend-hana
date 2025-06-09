@@ -1,6 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
+import { authFetch } from '@/lib/api/authFetch';
 
 interface User {
   name: string;
@@ -19,8 +20,6 @@ const UserContext = createContext<UserContextType>({
   loading: true,
 });
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:4000';
-
 export function UserProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,30 +27,26 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`${API_BASE_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-
-        if (!res.ok) throw new Error('사용자 정보 요청 실패');
-
+        const res = await authFetch('/users/me');
         const data = await res.json();
         setUser(data);
       } catch (err) {
         console.error('❌ 사용자 정보 조회 실패:', err);
-        setUser(null);
+        setUser(null); // authFetch에서 모달 뜸
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUser();
+    // ✅ 브라우저 환경일 때만 실행 (서버에서는 localStorage 없음)
+    if (typeof window !== 'undefined') {
+      fetchUser();
+    }
   }, []);
 
   return (
     <UserContext.Provider value={{ user, loading }}>
-      {children}
+      {!loading && children}
     </UserContext.Provider>
   );
 }

@@ -3,7 +3,7 @@ import HomePage from './HomePage';
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>홈페이지 로딩 중...</div>}>
+    <Suspense fallback={<div> </div>}>
       <HomePage />
     </Suspense>
   );

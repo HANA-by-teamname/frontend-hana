@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import PostCard from './PostCard';
 import { getFaculties } from '@/lib/api/getfaculty';
+import { authFetch } from '@/lib/api/authFetch';
 import { USER_ME_ENDPOINT, SEARCH_FEED_ENDPOINT } from '@/lib/constants';
 
 interface Post {
@@ -25,36 +26,18 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
   const [allFaculties, setAllFaculties] = useState<string[]>([]);
   const [selectedFaculties, setSelectedFaculties] = useState<string[]>([]);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
-
   useEffect(() => {
     const fetchInitial = async () => {
-      if (!token) {
-        alert('다시 로그인해주세요!');
-        window.location.href = '/login';
-        return;
-      }
-
       try {
-        const facultyList = await getFaculties();
+        const facultyList = await getFaculties(); // 공개 API라 authFetch 안 써도 됨
         setAllFaculties(facultyList);
 
-        const resUser = await fetch(USER_ME_ENDPOINT, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        if (resUser.status === 403 || resUser.status === 401) {
-          alert('다시 로그인해주세요!');
-          localStorage.removeItem('token');
-          window.location.href = '/login';
-          return;
-        }
-
+        const resUser = await authFetch(USER_ME_ENDPOINT); // ✅ 모달 처리 포함
         const userData = await resUser.json();
         setSelectedFaculties(userData.data_sources || []);
       } catch (err) {
-        alert('다시 로그인해주세요!');
-        window.location.href = '/login';
+        console.error('❌ 사용자 정보 로딩 실패:', err);
+        setSelectedFaculties([]); // fallback
       }
     };
 
@@ -65,13 +48,16 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
     const fetchFeed = async () => {
       try {
         setIsLoading(true);
-        const resFeed = await fetch(SEARCH_FEED_ENDPOINT, {
+        const resFeed = await authFetch(SEARCH_FEED_ENDPOINT, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ keyword: '', faculty: selectedFaculties, sort: '최신순' }),
+          body: JSON.stringify({
+            keyword: '',
+            faculty: selectedFaculties,
+            sort: '최신순',
+          }),
         });
 
         const data = await resFeed.json();
@@ -88,7 +74,7 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
           }))
         );
       } catch (err) {
-        console.error('기본 피드 불러오기 실패', err);
+        console.error('기본 피드 불러오기 실패:', err);
         setPosts([]);
       } finally {
         setIsLoading(false);
@@ -108,20 +94,16 @@ export default function DefaultFeed({ toggleLike, posts, setPosts }: DefaultFeed
     setSelectedFaculties(updated);
 
     try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/update-faculty`, {
+      await authFetch(`${process.env.NEXT_PUBLIC_API_URL}/users/update-faculty`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ data_sources: updated }),
       });
-
-      if (!res.ok) {
-        throw new Error('서버 응답 실패');
-      }
     } catch (err) {
       console.error('❌ 필터 DB 업데이트 실패:', err);
+      // 이 경우는 모달까지 띄우는 건 과한 경우라 alert 유지 가능
       alert('서버에 필터 설정 저장 중 오류가 발생했어요.');
     }
   };

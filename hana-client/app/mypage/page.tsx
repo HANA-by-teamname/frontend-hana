@@ -8,6 +8,8 @@ import AddSubjectModal from './AddSubjectModal';
 import Image from 'next/image';
 import FooterNav from '@/components/FooterNav';
 import MyPageHeader from '@/components/headers/MyPageHeader';
+import SessionExpiredModal from '@/components/modals/SessionExpiredModal';
+import { authFetch } from '@/lib/api/authFetch';
 
 interface UserInfo {
   nickname: string;
@@ -20,23 +22,23 @@ export default function MyPage() {
   const [showModal, setShowModal] = useState(false);
   const [subjects, setSubjects] = useState<any[]>([]);
   const [user, setUser] = useState<UserInfo | null>(null);
+  const [showSessionExpired, setShowSessionExpired] = useState(false);
 
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const token = localStorage.getItem('token') || '';
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/users/me`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const data = await res.json();
-      setUser({
-        nickname: data.nickname,
-        faculty: data.faculty,
-        profileImage: data.profileImage || null,
-      });
-      if (!data.profileImage) {
-        setProfileImage('/images/puang.jpg');
-      } else {
-        setProfileImage(data.profileImage);
+      try {
+        const res = await authFetch('/users/me');
+        if (!res.ok) throw new Error('세션 만료');
+        const data = await res.json();
+        setUser({
+          nickname: data.nickname,
+          faculty: data.faculty,
+          profileImage: data.profileImage || null,
+        });
+        setProfileImage(data.profileImage || '/images/puang.jpg');
+      } catch (error) {
+        console.error('❌ 사용자 정보 불러오기 실패:', error);
+        setShowSessionExpired(true); // fallback - 거의 필요 없지만 대비용
       }
     };
     fetchUserInfo();
@@ -106,6 +108,12 @@ export default function MyPage() {
           onClose={() => setShowModal(false)}
         />
       )}
+
+      {/* 세션 만료 모달 */}
+      <SessionExpiredModal
+        visible={showSessionExpired}
+        onClose={() => setShowSessionExpired(false)}
+      />
 
       <FooterNav />
     </main>

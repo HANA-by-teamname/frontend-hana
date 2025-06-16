@@ -3,26 +3,22 @@
 > 하나뿐인 유학생활을 위한 통합 플랫폼  
 > `Next.js` 기반 프론트엔드 레포입니다.
 
----
+--- 
 
-## 🎨 화면 구성
+## 🙋‍♀️ 주요 기여자
 
-## 🎨 화면 구성
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/yousrchive">
+        <img src="https://github.com/yousrchive.png" width="100" style="border-radius: 50%"/><br/>
+        <strong>이유정</strong>
+      </a><br/>
+      프론트엔드 리드
+    </td>
+  </tr>
+</table>
 
-| 화면 이름 | 미리보기 |
-|-----------|----------|
-| 스프린트 | ![](./asset/sprint.png) |
-| 로그인 화면 | ![](./asset/login.png) |
-| 오류 안내 | ![](./asset/error.png) |
-| 회원가입 선택 화면 | ![](./asset/signup_select.png) |
-| 회원가입 온보딩 화면 | ![](./asset/signup_onboarding.png) |
-| 홈 화면 | ![](./asset/home.png) |
-| 검색 | ![](./asset/search.png) |
-| 검색 필터 | ![](./asset/search_filter.png) |
-| 챗봇 | ![](./asset/chatbot.png) |
-| 마이페이지 - 재학생 인증 | ![](./asset/mypage_auth.png) |
-| 시간표 등록 | ![](./asset/timetable.png) |
-| 카카오톡 연동 | ![](./asset/kakao.png) |
 
 ---
 
@@ -64,6 +60,29 @@ hana\_client/
 | **Vercel**       | 정적 호스팅(예정)                          |
 
 ---
+
+
+---
+
+## 🎨 화면 구성
+
+| 화면 이름 | 미리보기 |
+|-----------|----------|
+| 스프린트 | ![](./asset/sprint.png) |
+| 로그인 화면 | ![](./asset/login.png) |
+| 오류 안내 | ![](./asset/error.png) |
+| 회원가입 선택 화면 | ![](./asset/signup_select.png) |
+| 회원가입 온보딩 화면 | ![](./asset/signup_onboarding.png) |
+| 홈 화면 | ![](./asset/home.png) |
+| 검색 | ![](./asset/search.png) |
+| 검색 필터 | ![](./asset/search_filter.png) |
+| 챗봇 | ![](./asset/chatbot.png) |
+| 마이페이지 - 재학생 인증 | ![](./asset/mypage_auth.png) |
+| 시간표 등록 | ![](./asset/timetable.png) |
+| 카카오톡 연동 | ![](./asset/kakao.png) |
+
+---
+
 
 ## 🚀 실행 가이드
 
@@ -128,13 +147,3 @@ NEXT_PUBLIC_GOOGLE_CLIENT_ID=...
 ## 📄 License
 
 이 프로젝트는 [MIT License](./LICENSE)를 따릅니다.
-
----
-
-## 🙋‍♀️ 주요 기여자
-
-| 이름            | 역할       |
-| ------------- | -------- |
-| 이유정(@youjung) | 프론트엔드 리드 |
-
-````

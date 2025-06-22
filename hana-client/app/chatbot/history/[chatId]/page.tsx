@@ -1,88 +1,56 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import ChatBubble from '@/components/chat/ChatBubble';
+import { useParams } from 'next/navigation';
 import { authFetch } from '@/lib/api/authFetch';
 
-interface ChatLog {
+interface ChatEntry {
   message: string;
   answer: string;
   createdAt: string;
 }
 
-export default function ChatHistoryDetailPage() {
-  const [logs, setLogs] = useState<ChatLog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const router = useRouter();
+export default function ChatHistoryPage() {
   const params = useParams();
-  const chatid = parseInt(params.chatid as string);
+  const chatId = Number(params.chatId);
+
+  const [entry, setEntry] = useState<ChatEntry | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchLogs = async () => {
+    const fetchHistory = async () => {
       try {
         const res = await authFetch('/chatbot/history');
         const data = await res.json();
-        if (!data.success) throw new Error('이력 조회 실패');
+        if (!data.success || !Array.isArray(data.history)) throw new Error('불러오기 실패');
 
-        const allLogs: ChatLog[] = data.history;
-        const grouped = splitIntoSessions(allLogs);
-        setLogs(grouped[chatid] || []);
+        if (chatId < 0 || chatId >= data.history.length) {
+          setEntry(null); // 범위 벗어난 경우
+        } else {
+          setEntry(data.history[chatId]);
+        }
       } catch (err) {
-        console.error('❌ 기록 불러오기 실패:', err);
+        console.error('❌ 대화 이력 불러오기 실패:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchLogs();
-  }, [chatid]);
 
-  const splitIntoSessions = (messages: ChatLog[], gapMinutes = 30) => {
-    const sessions: ChatLog[][] = [];
-    let current: ChatLog[] = [];
-    for (let i = 0; i < messages.length; i++) {
-      const msg = messages[i];
-      const prev = messages[i - 1];
-      if (
-        i === 0 ||
-        new Date(msg.createdAt).getTime() - new Date(prev.createdAt).getTime() <
-          gapMinutes * 60 * 1000
-      ) {
-        current.push(msg);
-      } else {
-        sessions.push(current);
-        current = [msg];
-      }
-    }
-    if (current.length > 0) sessions.push(current);
-    return sessions;
-  };
+    fetchHistory();
+  }, [chatId]);
+
+  if (loading) return <p className="p-4">로딩 중...</p>;
+  if (!entry) return <p className="p-4 text-gray-500">해당 대화 내역이 없습니다.</p>;
 
   return (
-    <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-20 px-4 pt-6 max-w-md mx-auto">
-      <button
-        onClick={() => router.back()}
-        className="text-sm text-blue-500 mb-4 hover:underline"
-      >
-        ← 뒤로가기
-      </button>
-
-      <h2 className="text-lg font-semibold mb-4">이전 채팅 보기</h2>
-
-      {loading ? (
-        <p>불러오는 중...</p>
-      ) : logs.length === 0 ? (
-        <p className="text-gray-500">기록이 없습니다.</p>
-      ) : (
-        <div className="space-y-4">
-          {logs.map((log, index) => (
-            <div key={index} className="space-y-2">
-              <ChatBubble role="user" content={log.message} />
-              <ChatBubble role="bot" content={log.answer} />
-            </div>
-          ))}
-        </div>
-      )}
-    </main>
+    <div className="p-4 space-y-3 font-pretendard">
+      <p className="text-gray-500 text-sm">{new Date(entry.createdAt).toLocaleString()}</p>
+      <div className="p-3 bg-gray-100 rounded-md">
+        <strong>나:</strong> {entry.message}
+      </div>
+      <div className="p-3 bg-blue-100 rounded-md">
+        <strong>챗봇:</strong> {entry.answer}
+      </div>
+    </div>
   );
 }

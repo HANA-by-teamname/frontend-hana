@@ -11,7 +11,110 @@ const translations: Record<string, Record<string, string>> = {
     zh: '校园地图', 
     vi: 'Bản đồ trường',
   },
-  
+
+  '졸업논문 제출': {
+    en: 'Submit Graduation Thesis',
+    ja: '卒業論文提出',
+    zh: '提交毕业论文',
+    vi: 'Nộp luận văn tốt nghiệp',
+  },
+  '2025년 2학기 다전공 신청': {
+    en: 'Application for Double Major (Fall 2025)',
+    ja: '2025年後期 複数専攻申請',
+    zh: '2025年第二学期 双专业申请',
+    vi: 'Đăng ký chuyên ngành kép kỳ 2/2025',
+  },
+  '2025년 2학기 전공개방모집 희망전공 신청': {
+    en: 'Application for Open Major Program (Fall 2025)',
+    ja: '2025年後期 オープン専攻申請',
+    zh: '2025年第二学期 开放专业志愿申请',
+    vi: 'Đăng ký chuyên ngành mở kỳ 2/2025',
+  },
+  '2025년 1학기 강의평가 실시': {
+    en: 'Course Evaluation (Spring 2025)',
+    ja: '2025年前期 授業評価実施',
+    zh: '2025年第一学期 课程评估',
+    vi: 'Đánh giá môn học kỳ 1/2025',
+  },
+  '제21대 대통령 선거일': {
+    en: '21st Presidential Election Day',
+    ja: '第21代大統領選挙日',
+    zh: '第21届总统选举日',
+    vi: 'Ngày bầu cử Tổng thống thứ 21',
+  },
+  '현충일(공휴일)': {
+    en: 'Memorial Day (Public Holiday)',
+    ja: '顕忠日（祝日）',
+    zh: '显忠日（公共假日）',
+    vi: 'Ngày tưởng niệm liệt sĩ (ngày nghỉ)',
+  },
+  '2025년 1학기 기말시험': {
+    en: 'Final Exams (Spring 2025)',
+    ja: '2025年前期 期末試験',
+    zh: '2025年第一学期 期末考试',
+    vi: 'Thi cuối kỳ 1/2025',
+  },
+  '2025년 1학기 성적입력': {
+    en: 'Grade Submission (Spring 2025)',
+    ja: '2025年前期 成績入力',
+    zh: '2025年第一学期 成绩录入',
+    vi: 'Nhập điểm học kỳ 1/2025',
+  },
+  '2025년 여름방학': {
+    en: 'Summer Vacation 2025',
+    ja: '2025年 夏休み',
+    zh: '2025年 暑假',
+    vi: 'Kỳ nghỉ hè 2025',
+  },
+  '2025년 하계 계절학기': {
+    en: 'Summer Session 2025',
+    ja: '2025年 夏季集中講義',
+    zh: '2025年 夏季学期',
+    vi: 'Học kỳ hè 2025',
+  },
+  '2025년 2학기 재입학 원서 접수': {
+    en: 'Re-admission Application (Fall 2025)',
+    ja: '2025年後期 再入学申請',
+    zh: '2025年第二学期 复学申请',
+    vi: 'Đăng ký tái nhập học kỳ 2/2025',
+  },
+  '2025년 1학기 성적조회': {
+    en: 'Grade Inquiry (Spring 2025)',
+    ja: '2025年前期 成績照会',
+    zh: '2025年第一学期 成绩查询',
+    vi: 'Xem điểm học kỳ 1/2025',
+  },
+  '2025년 1학기 성적정정': {
+    en: 'Grade Correction (Spring 2025)',
+    ja: '2025年前期 成績修正',
+    zh: '2025年第一学期 成绩更正',
+    vi: 'Chỉnh sửa điểm kỳ 1/2025',
+  },
+  '2025년 1학기 성적확정 및 2학기 전공개방모집 희망전공 정정': {
+    en: 'Grade Finalization & Open Major Adjustment (Fall 2025)',
+    ja: '成績確定および専攻調整（2025年後期）',
+    zh: '成绩确定与开放专业调整（2025年第二学期）',
+    vi: 'Chốt điểm & chỉnh sửa chuyên ngành mở (kỳ 2/2025)',
+  },
+  '2025년 2학기 복학신청': {
+    en: 'Return-to-School Application (Fall 2025)',
+    ja: '2025年後期 復学申請',
+    zh: '2025年第二学期 复学申请',
+    vi: 'Đăng ký đi học lại kỳ 2/2025',
+  },
+  '2025년 2학기 휴학신청': {
+    en: 'Leave of Absence Application (Fall 2025)',
+    ja: '2025年後期 休学申請',
+    zh: '2025年第二学期 休学申请',
+    vi: 'Đăng ký nghỉ học kỳ 2/2025',
+  },
+  '2025년 2학기 수강신청 장바구니': {
+    en: 'Course Cart (Fall 2025)',
+    ja: '2025年後期 履修登録カート',
+    zh: '2025年第二学期 选课购物车',
+    vi: 'Giỏ đăng ký môn học kỳ 2/2025',
+  },
+
   '오늘 강의': {
     en: "Today's Classes", ja: '今日の授業', zh: '今日课程', vi: 'Lớp học hôm nay',
   },

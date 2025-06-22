@@ -58,7 +58,7 @@ export default function ChatHeader({ onHistoryClick }: ChatHeaderProps) {
             {loading
               ? '사용자 정보를 불러오는 중입니다...'
               : defaultLang
-              ? '학교 관련 질문이라면 무엇이든! 똑똑한 하나봇'
+              ? '학교 관련 질문이라면 무엇이든 환영해요 :)'
               : '사용자 정보를 찾을 수 없습니다.'}
           </p>
         </div>

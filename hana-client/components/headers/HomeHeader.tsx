@@ -23,14 +23,23 @@ export default function HomeHeader({ userName, faculty }: HomeHeaderProps) {
   }, [translateOn]);
 
   return (
-    <div className="w-full px-4 py-4 bg-[#F9FAFB] shadow-sm flex items-center justify-between">
-      <div className="flex flex-col items-start text-left gap-0.5">
-        <p className="text-sm text-gray-600 tracking-tight">
-          안녕하세요, <span className="font-semibold">{userName}</span>님!
-        </p>
-        <h2 className="text-lg font-bold text-gray-800 tracking-tight">
-          {faculty}
-        </h2>
+    <div className="w-full px-4 py-4 bg-[#0C8CE9] shadow-sm flex items-center justify-between text-white font-pretendard">
+      <div className="flex items-center gap-3">
+        <Image
+          src="/images/hana_main.png" // ✅ 반드시 public/images/hana_main.png 위치
+          alt="logo"
+          width={40}
+          height={40}
+          className="rounded-full"
+        />
+        <div className="flex flex-col items-start text-left gap-0.5">
+          <p className="text-sm text-gray-200 tracking-tight">
+            안녕하세요, <span className="font-semibold text-white">{userName}</span>님!
+          </p>
+          <h2 className="text-lg font-bold text-white tracking-tight">
+            {faculty}
+          </h2>
+        </div>
       </div>
 
       <div className="flex items-center gap-2">
@@ -50,7 +59,6 @@ export default function HomeHeader({ userName, faculty }: HomeHeaderProps) {
             height={28}
           />
         </button>
-
       </div>
     </div>
   );

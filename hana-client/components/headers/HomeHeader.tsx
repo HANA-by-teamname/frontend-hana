@@ -1,32 +1,32 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import { t } from '@/lib/utils/translate';
 
 interface HomeHeaderProps {
   userName: string;
   faculty: string;
+  translateOn: boolean;
+  nativeLanguage: string;
+  toggleTranslate: () => void;
 }
 
-export default function HomeHeader({ userName, faculty }: HomeHeaderProps) {
+export default function HomeHeader({
+  userName,
+  faculty,
+  translateOn,
+  nativeLanguage,
+  toggleTranslate,
+}: HomeHeaderProps) {
   const router = useRouter();
-  const [translateOn, setTranslateOn] = useState(false);
-
-  useEffect(() => {
-    const saved = localStorage.getItem('translate');
-    if (saved === 'true') setTranslateOn(true);
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('translate', String(translateOn));
-  }, [translateOn]);
 
   return (
     <div className="w-full px-4 py-4 bg-[#0C8CE9] shadow-sm flex items-center justify-between text-white font-pretendard">
       <div className="flex items-center gap-3">
         <Image
-          src="/images/hana_main.png" // ✅ 반드시 public/images/hana_main.png 위치
+          src="/images/hana_main.png"
           alt="logo"
           width={40}
           height={40}
@@ -37,14 +37,14 @@ export default function HomeHeader({ userName, faculty }: HomeHeaderProps) {
             안녕하세요, <span className="font-semibold text-white">{userName}</span>님!
           </p>
           <h2 className="text-lg font-bold text-white tracking-tight">
-            {faculty}
+            {translateOn ? t(faculty, nativeLanguage) : faculty}
           </h2>
         </div>
       </div>
 
       <div className="flex items-center gap-2">
         <button
-          onClick={() => setTranslateOn((prev) => !prev)}
+          onClick={toggleTranslate}
           aria-label="번역 토글"
           className="p-1"
         >

@@ -67,7 +67,7 @@ export default function AddSubjectModal({ onAdd, onClose }: AddSubjectModalProps
 
         <input
           name="name"
-          placeholder="예: 경제학원론"
+          placeholder="예: 오픈소스SW프로젝트"
           value={form.name}
           onChange={handleChange}
           className="w-full border px-3 py-2 text-sm rounded"
@@ -97,7 +97,7 @@ export default function AddSubjectModal({ onAdd, onClose }: AddSubjectModalProps
 
         <input
           name="professor"
-          placeholder="예: 김민지 교수님"
+          placeholder="예: 김영빈 교수님"
           value={form.professor}
           onChange={handleChange}
           className="w-full border px-3 py-2 text-sm rounded"
@@ -105,7 +105,7 @@ export default function AddSubjectModal({ onAdd, onClose }: AddSubjectModalProps
 
         <input
           name="location"
-          placeholder="예: 310관 205호"
+          placeholder="예: 310관 727호"
           value={form.location}
           onChange={handleChange}
           className="w-full border px-3 py-2 text-sm rounded"

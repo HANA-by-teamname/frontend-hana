@@ -95,18 +95,20 @@ function HomePage() {
       setShowModal(true);
       setTimeout(() => setShowModal(false), 3000);
     }
-  }, [searchParams]);
+  }, [searchParams, translateOn]);
 
   return (
     <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24">
       {showModal && <SignupCompleteModal />}
 
       {userName && faculty && (
-        <div className="w-full flex justify-center pt-[24px]">
-          <div className="w-full max-w-[360px] px-4">
-            <HomeHeader userName={userName} faculty={faculty} />
-          </div>
-        </div>
+        <HomeHeader
+          userName={userName}
+          faculty={translateOn ? t(faculty, nativeLanguage) : faculty}
+          translateOn={translateOn}
+          nativeLanguage={nativeLanguage}
+          toggleTranslate={() => setTranslateOn(prev => !prev)} // ✅ 추가
+        />
       )}
 
       <div className="w-full flex justify-center">

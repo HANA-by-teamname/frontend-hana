@@ -72,7 +72,7 @@ export default function SearchBar({
       />
       {/* ✅ Search icon */}
       <Image
-        src="/icons/Search.svg"
+        src="/icons/Dotbogi.svg"
         alt="검색"
         width={16}
         height={16}

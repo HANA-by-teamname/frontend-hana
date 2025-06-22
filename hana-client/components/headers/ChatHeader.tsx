@@ -74,17 +74,6 @@ export default function ChatHeader({ onHistoryClick }: ChatHeaderProps) {
               className="hover:opacity-80 transition"
             />
           </button>
-
-          {/* 설정 버튼 */}
-          <button onClick={() => setIsModalOpen(true)}>
-            <Image
-              src="/icons/Settings.svg"
-              alt="설정"
-              width={24}
-              height={24}
-              className="hover:opacity-80 transition"
-            />
-          </button>
         </div>
       </div>
 

@@ -48,13 +48,15 @@ export default function ForWorkSection({ nativeLanguage, translateOn }: ForWorkS
                 className="w-full h-[120px] object-cover"
               />
               <div className="p-3 text-sm space-y-1">
-               <p className="font-semibold text-gray-800">
-                {translateOn ? job.title[nativeLanguage] || job.title.ko : job.title.ko}
-              </p>
-              <p className="text-xs text-gray-500">{job.company}</p>
-              <p className="text-xs text-gray-700">
-                {translateOn ? job.description[nativeLanguage] || job.description.ko : job.description.ko}
-              </p>
+                <p className="font-semibold text-gray-800 line-clamp-1">
+                  {translateOn ? job.title[nativeLanguage] || job.title.ko : job.title.ko}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {job.company}
+                </p>
+                <p className="text-xs text-gray-700 line-clamp-2">
+                  {translateOn ? job.description[nativeLanguage] || job.description.ko : job.description.ko}
+                </p>
                 <p className="text-xs text-right text-gray-400 mt-1">{job.date}</p>
               </div>
             </div>

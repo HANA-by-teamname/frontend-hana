@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import SignupCompleteModal from '@/components/SignupCompleteModal';
 import FooterNav from '@/components/FooterNav';
-import CampusMap from '@/components/CampusMapWrapper';
+import ForWorkSection from './ForWorkSection';
 import HomeHeader from '@/components/headers/HomeHeader';
 import withAuth from '@/hoc/withAuth';
 import { academicSchedules } from '@/lib/data/academicSchedules';
@@ -12,8 +12,6 @@ import { format, isWithinInterval, parseISO, isAfter, isToday } from 'date-fns';
 import { authFetch } from '@/lib/api/authFetch';
 import { USER_ME_ENDPOINT } from '@/lib/constants';
 import { t } from '@/lib/utils/translate';
-// 최상단 import 부분에 아래 추가:
-import ForWorkSection from './ForWorkSection';
 import Link from 'next/link';
 
 interface ClassInfo {
@@ -101,23 +99,25 @@ function HomePage() {
   }, [searchParams, translateOn]);
 
   return (
-    <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24">
+    <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-32">
       {showModal && <SignupCompleteModal />}
 
       {userName && faculty && (
-        <HomeHeader
-          userName={userName}
-          faculty={translateOn ? t(faculty, nativeLanguage) : faculty}
-          translateOn={translateOn}
-          nativeLanguage={nativeLanguage}
-          toggleTranslate={() => setTranslateOn(prev => !prev)} // ✅ 추가
-        />
+        <div className="sticky top-0 z-50 bg-[#F9FAFB] shadow-sm">
+          <HomeHeader
+            userName={userName}
+            faculty={translateOn ? t(faculty, nativeLanguage) : faculty}
+            translateOn={translateOn}
+            nativeLanguage={nativeLanguage}
+            toggleTranslate={() => setTranslateOn(prev => !prev)}
+          />
+        </div>
       )}
 
       <div className="w-full flex justify-center">
         <div className="w-full max-w-[360px] space-y-6 px-4 pt-6 leading-[1.5]">
 
-          {/* ✅ 학사일정 섹션 */}
+          {/* 학사일정 */}
           <section>
             <h3 className="text-sm font-semibold mb-3 text-gray-700">
               {translateOn ? t('학사일정', nativeLanguage) : '학사일정'}
@@ -149,17 +149,7 @@ function HomePage() {
             </div>
           </section>
 
-          {/* ✅ 지도 부분 삭제
-          <section>
-            <h3 className="text-sm font-semibold mb-3 text-gray-700">
-              {translateOn ? t('우리학교 지도', nativeLanguage) : '우리학교 지도'}
-            </h3>
-            <div className="rounded-md overflow-hidden shadow">
-              <CampusMap />
-            </div>
-          </section> */}
-
-          {/* ✅ 오늘 강의 */}
+          {/* 오늘 강의 */}
           <section className="space-y-2">
             <h3 className="text-sm font-semibold mb-3 text-gray-700">
               {translateOn ? t('오늘 강의', nativeLanguage) : '오늘 강의'}
@@ -191,10 +181,9 @@ function HomePage() {
                 </div>
               ))
             )}
-
           </section>
 
-          {/* ✅ 학식 */}
+          {/* 오늘의 학식 */}
           <section className="space-y-3">
             <h3 className="text-sm font-semibold mb-3 text-gray-700">
               {translateOn ? t('오늘의 학식', nativeLanguage) : '오늘의 학식'}
@@ -222,21 +211,20 @@ function HomePage() {
             ))}
           </section>
 
-                    {/* ✅ 한국에서 취업하기 - ForWorkSection으로 교체 */}
-          <ForWorkSection    
-          nativeLanguage={nativeLanguage}
-          translateOn={translateOn}  
+          {/* 한국에서 취업하기 */}
+          <ForWorkSection
+            nativeLanguage={nativeLanguage}
+            translateOn={translateOn}
           />
 
         </div>
       </div>
 
-      <div className="text-center text-xs text-gray-400 py-2 bg-white">
-  © 2025 HANA. All rights reserved.
-</div>
-
-
       <FooterNav nativeLanguage={nativeLanguage} translateOn={translateOn} />
+
+      <footer className="w-full text-center text-xs text-gray-400 py-2 bg-white">
+        © 2025 HANA. All rights reserved.
+      </footer>
     </main>
   );
 }

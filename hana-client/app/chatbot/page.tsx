@@ -23,9 +23,8 @@ export default function ChatPage() {
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const lastActivityRef = useRef(Date.now()); // ✅ 마지막 활동 시간 기록
+  const lastActivityRef = useRef(Date.now());
 
-  // 초기 대화 로딩
   useEffect(() => {
     const init = async () => {
       try {
@@ -44,7 +43,6 @@ export default function ChatPage() {
     init();
   }, []);
 
-  // 10분 비활성 감지
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
@@ -58,7 +56,7 @@ export default function ChatPage() {
           },
         ]);
       }
-    }, 10000); // 10초마다 검사
+    }, 10000);
 
     return () => clearInterval(interval);
   }, []);
@@ -67,7 +65,7 @@ export default function ChatPage() {
     const trimmed = input.trim();
     if (!trimmed) return;
 
-    lastActivityRef.current = Date.now(); // ✅ 활동 시간 갱신
+    lastActivityRef.current = Date.now();
     const userMessage: Message = { role: 'user', content: trimmed };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
@@ -89,7 +87,7 @@ export default function ChatPage() {
   };
 
   const handleSuggestion = async (text: string) => {
-    lastActivityRef.current = Date.now(); // ✅ 활동 시간 갱신
+    lastActivityRef.current = Date.now();
     setInput('');
     setLoading(true);
     const userMessage: Message = { role: 'user', content: text };
@@ -115,19 +113,22 @@ export default function ChatPage() {
 
   return (
     <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-24">
-      <div className="w-full max-w-md mx-auto px-4 pt-6 space-y-4">
+      {/* 🔒 Sticky Header */}
+      <div className="sticky top-0 z-30 bg-[#F9FAFB] max-w-md mx-auto px-4 pt-4">
         <ChatHeader onHistoryClick={() => setShowHistoryModal(true)} />
+      </div>
+
+      {/* ✅ 콘텐츠 영역 */}
+      <div className="w-full max-w-md mx-auto px-4 pt-2 space-y-4">
         <div className="space-y-4">
           {messages.map((msg, i) => (
             <ChatBubble key={i} role={msg.role} content={msg.content} />
           ))}
-          {loading && (
-            <ChatBubble role="bot" content="답변을 생성 중이에요..." />
-          )}
+          {loading && <ChatBubble role="bot" content="답변을 생성 중이에요..." />}
           <div ref={bottomRef} />
         </div>
 
-        {/* 🔁 종료 메시지일 경우만 히스토리 안내 버튼 */}
+        {/* 🔁 자동 종료 시 히스토리 버튼 */}
         {messages.length === 1 &&
           messages[0].content.includes('자동 종료') && (
             <div className="text-center mt-4">
@@ -140,6 +141,7 @@ export default function ChatPage() {
             </div>
           )}
 
+        {/* 🔁 초기 메시지일 경우 추천 질문 */}
         {messages.length === 1 && !loading && (
           <div className="mt-2">
             <ChatSuggestions onSelect={handleSuggestion} />
@@ -147,7 +149,7 @@ export default function ChatPage() {
         )}
       </div>
 
-      {/* 하단 입력창 */}
+      {/* 입력창 */}
       {!(messages.length === 1 && messages[0].content.includes('자동 종료')) && (
         <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full px-4">
           <div className="max-w-md mx-auto w-full">
@@ -156,15 +158,16 @@ export default function ChatPage() {
         </div>
       )}
 
+      {/* 하단 네비게이션 */}
       <div className="fixed bottom-0 w-full">
         <FooterNav />
       </div>
 
+      {/* 모달 */}
       <SessionExpiredModal
         visible={showSessionExpired}
         onClose={() => setShowSessionExpired(false)}
       />
-
       {showHistoryModal && (
         <ChatHistoryModal onClose={() => setShowHistoryModal(false)} />
       )}

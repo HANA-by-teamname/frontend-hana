@@ -203,6 +203,14 @@ const translations: Record<string, Record<string, string>> = {
   '❌ 오늘 강의 로딩 실패:': {
     en: '❌ Failed to load today’s classes:', ja: '❌ 今日の授業の読み込みに失敗:', zh: '❌ 今日课程加载失败：', vi: '❌ Tải lớp học hôm nay thất bại:',
   },
+  
+  '더 많은 채용 정보가 궁금하다면?': {
+    en: 'Want to see more job postings?',
+    ja: 'もっと多くの求人情報が知りたいですか？',
+    zh: '想查看更多招聘信息吗？',
+    vi: 'Bạn muốn xem thêm các tin tuyển dụng?',
+    ko: '더 많은 채용 정보가 궁금하다면?',
+  },
 
 };
 

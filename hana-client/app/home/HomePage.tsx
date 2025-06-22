@@ -12,6 +12,8 @@ import { format, isWithinInterval, parseISO, isAfter, isToday } from 'date-fns';
 import { authFetch } from '@/lib/api/authFetch';
 import { USER_ME_ENDPOINT } from '@/lib/constants';
 import { t } from '@/lib/utils/translate';
+// 최상단 import 부분에 아래 추가:
+import ForWorkSection from './ForWorkSection';
 
 interface ClassInfo {
   time: string;
@@ -146,7 +148,7 @@ function HomePage() {
             </div>
           </section>
 
-          {/* ✅ 지도 */}
+          {/* ✅ 지도 부분 삭제
           <section>
             <h3 className="text-sm font-semibold mb-3 text-gray-700">
               {translateOn ? t('우리학교 지도', nativeLanguage) : '우리학교 지도'}
@@ -154,7 +156,13 @@ function HomePage() {
             <div className="rounded-md overflow-hidden shadow">
               <CampusMap />
             </div>
-          </section>
+          </section> */}
+
+          {/* ✅ 한국에서 취업하기 - ForWorkSection으로 교체 */}
+          <ForWorkSection    
+          nativeLanguage={nativeLanguage}
+          translateOn={translateOn}  
+          />
 
           {/* ✅ 오늘 강의 */}
           <section className="space-y-2">

@@ -12,7 +12,7 @@ interface FooterNavProps {
 const navItems = [
   { name: '홈', href: '/home', icon: 'Store.svg' },
   { name: '검색', href: '/search', icon: 'Dotbogi.svg' }, // ✅ 변경됨
-  { name: '채팅', href: '/chatbot', icon: 'Explore.svg' },
+  { name: '채팅', href: '/chatbot', icon: 'Chat.svg' },
   { name: '마이', href: '/mypage', icon: 'Profile.svg' },
 ];
 

@@ -6,7 +6,7 @@ import ChatBubble from '@/components/chat/ChatBubble';
 import ChatSuggestions from '@/components/chat/ChatSuggestion';
 import FooterNav from '@/components/FooterNav';
 import ChatHeader from '@/components/headers/ChatHeader';
-import ChatHistoryModal from '@/components/modals/ChatHistoryModal'; // ✅ 추가
+import ChatHistoryModal from '@/components/modals/ChatHistoryModal';
 import SessionExpiredModal from '@/components/modals/SessionExpiredModal';
 import { sendChatbotMessage, fetchChatHistory } from '@/lib/api/chatbot';
 
@@ -20,10 +20,12 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [showSessionExpired, setShowSessionExpired] = useState(false);
-  const [showHistoryModal, setShowHistoryModal] = useState(false); // ✅ 추가
+  const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
+  const lastActivityRef = useRef(Date.now()); // ✅ 마지막 활동 시간 기록
 
+  // 초기 대화 로딩
   useEffect(() => {
     const init = async () => {
       try {
@@ -42,10 +44,30 @@ export default function ChatPage() {
     init();
   }, []);
 
+  // 10분 비활성 감지
+  useEffect(() => {
+    const interval = setInterval(() => {
+      const now = Date.now();
+      const elapsed = now - lastActivityRef.current;
+
+      if (elapsed >= 10 * 60 * 1000) {
+        setMessages([
+          {
+            role: 'bot',
+            content: '⏰ 10분 이상 대화가 없어 자동 종료되었어요. 히스토리에서 다시 확인해 보세요!',
+          },
+        ]);
+      }
+    }, 10000); // 10초마다 검사
+
+    return () => clearInterval(interval);
+  }, []);
+
   const handleSend = async () => {
     const trimmed = input.trim();
     if (!trimmed) return;
 
+    lastActivityRef.current = Date.now(); // ✅ 활동 시간 갱신
     const userMessage: Message = { role: 'user', content: trimmed };
     setMessages((prev) => [...prev, userMessage]);
     setInput('');
@@ -67,6 +89,7 @@ export default function ChatPage() {
   };
 
   const handleSuggestion = async (text: string) => {
+    lastActivityRef.current = Date.now(); // ✅ 활동 시간 갱신
     setInput('');
     setLoading(true);
     const userMessage: Message = { role: 'user', content: text };
@@ -103,18 +126,35 @@ export default function ChatPage() {
           )}
           <div ref={bottomRef} />
         </div>
-        {messages.length === 1 && (
+
+        {/* 🔁 종료 메시지일 경우만 히스토리 안내 버튼 */}
+        {messages.length === 1 &&
+          messages[0].content.includes('자동 종료') && (
+            <div className="text-center mt-4">
+              <button
+                onClick={() => setShowHistoryModal(true)}
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                대화 이력 보기
+              </button>
+            </div>
+          )}
+
+        {messages.length === 1 && !loading && (
           <div className="mt-2">
             <ChatSuggestions onSelect={handleSuggestion} />
           </div>
         )}
       </div>
 
-      <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full px-4">
-        <div className="max-w-md mx-auto w-full">
-          <ChatInput value={input} onChange={setInput} onSend={handleSend} />
+      {/* 하단 입력창 */}
+      {!(messages.length === 1 && messages[0].content.includes('자동 종료')) && (
+        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full px-4">
+          <div className="max-w-md mx-auto w-full">
+            <ChatInput value={input} onChange={setInput} onSend={handleSend} />
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="fixed bottom-0 w-full">
         <FooterNav />

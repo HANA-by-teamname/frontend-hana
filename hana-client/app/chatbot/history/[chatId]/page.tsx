@@ -1,8 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { authFetch } from '@/lib/api/authFetch';
+import { useParams, useRouter } from 'next/navigation';
+import ChatBubble from '@/components/chat/ChatBubble';
+import { ChevronLeft } from 'lucide-react';
 
 interface ChatEntry {
   message: string;
@@ -12,45 +13,48 @@ interface ChatEntry {
 
 export default function ChatHistoryPage() {
   const params = useParams();
-  const chatId = Number(params.chatId);
+  const router = useRouter();
+  const rawId = Array.isArray(params.chatId) ? params.chatId[0] : params.chatId;
+  const chatId = rawId ? parseInt(rawId, 10) : -1;
 
-  const [entry, setEntry] = useState<ChatEntry | null>(null);
+  const [session, setSession] = useState<ChatEntry[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchHistory = async () => {
-      try {
-        const res = await authFetch('/chatbot/history');
-        const data = await res.json();
-        if (!data.success || !Array.isArray(data.history)) throw new Error('불러오기 실패');
+    if (chatId < 0) return;
 
-        if (chatId < 0 || chatId >= data.history.length) {
-          setEntry(null); // 범위 벗어난 경우
-        } else {
-          setEntry(data.history[chatId]);
+    const raw = localStorage.getItem(`chatSession-${chatId}`);
+    if (raw) {
+      try {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          setSession(parsed);
         }
       } catch (err) {
-        console.error('❌ 대화 이력 불러오기 실패:', err);
-      } finally {
-        setLoading(false);
+        console.error('❌ 세션 파싱 실패:', err);
       }
-    };
-
-    fetchHistory();
+    }
+    setLoading(false);
   }, [chatId]);
 
   if (loading) return <p className="p-4">로딩 중...</p>;
-  if (!entry) return <p className="p-4 text-gray-500">해당 대화 내역이 없습니다.</p>;
+  if (!session) return <p className="p-4 text-gray-500">해당 대화 내역을 찾을 수 없습니다.</p>;
 
   return (
-    <div className="p-4 space-y-3 font-pretendard">
-      <p className="text-gray-500 text-sm">{new Date(entry.createdAt).toLocaleString()}</p>
-      <div className="p-3 bg-gray-100 rounded-md">
-        <strong>나:</strong> {entry.message}
+    <div className="p-4 space-y-4 font-pretendard max-w-md mx-auto min-h-screen bg-[#F9FAFB]">
+      <div className="flex items-center space-x-2">
+        <button onClick={() => router.back()}>
+          <ChevronLeft className="w-6 h-6 text-gray-600" />
+        </button>
+        <h1 className="text-lg font-semibold">이전 대화</h1>
       </div>
-      <div className="p-3 bg-blue-100 rounded-md">
-        <strong>챗봇:</strong> {entry.answer}
-      </div>
+
+      {session.map((entry, i) => (
+        <div key={i}>
+          <ChatBubble role="user" content={entry.message} />
+          <ChatBubble role="bot" content={entry.answer} />
+        </div>
+      ))}
     </div>
   );
 }

@@ -217,16 +217,17 @@ function HomePage() {
             translateOn={translateOn}
           />
 
+        {/* ✅ ⬇️ rights */}
+        <div className="text-center text-xs text-gray-400 py-2">
+          © 2025 HANA. All rights reserved.
         </div>
       </div>
+    </div>
 
-      <FooterNav nativeLanguage={nativeLanguage} translateOn={translateOn} />
-
-      <footer className="w-full text-center text-xs text-gray-400 py-2 bg-white">
-        © 2025 HANA. All rights reserved.
-      </footer>
-    </main>
-  );
+    {/* ✅ 항상 마지막 */}
+    <FooterNav nativeLanguage={nativeLanguage} translateOn={translateOn} />
+  </main>
+);
 }
 
 export default withAuth(HomePage);

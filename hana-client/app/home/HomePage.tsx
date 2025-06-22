@@ -231,6 +231,11 @@ function HomePage() {
         </div>
       </div>
 
+      <div className="text-center text-xs text-gray-400 py-2 bg-white">
+  © 2025 HANA. All rights reserved.
+</div>
+
+
       <FooterNav nativeLanguage={nativeLanguage} translateOn={translateOn} />
     </main>
   );

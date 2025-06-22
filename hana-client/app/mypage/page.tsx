@@ -190,6 +190,11 @@ export default function MyPage() {
         onClose={() => setShowSessionExpired(false)}
       />
 
+      <div className="text-center text-xs text-gray-400 py-2 bg-white">
+  © 2025 HANA. All rights reserved.
+</div>
+
+
       <FooterNav />
     </main>
   );

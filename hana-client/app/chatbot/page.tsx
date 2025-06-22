@@ -112,13 +112,13 @@ export default function ChatPage() {
   }, [messages]);
 
   return (
-    <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-24">
-      {/* 🔒 Sticky Header */}
+    <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-[120px]">
+      {/* Sticky Header */}
       <div className="sticky top-0 z-30 bg-[#F9FAFB] max-w-md mx-auto px-4 pt-4">
         <ChatHeader onHistoryClick={() => setShowHistoryModal(true)} />
       </div>
 
-      {/* ✅ 콘텐츠 영역 */}
+      {/* Content */}
       <div className="w-full max-w-md mx-auto px-4 pt-2 space-y-4">
         <div className="space-y-4">
           {messages.map((msg, i) => (
@@ -128,7 +128,7 @@ export default function ChatPage() {
           <div ref={bottomRef} />
         </div>
 
-        {/* 🔁 자동 종료 시 히스토리 버튼 */}
+        {/* 종료 안내 버튼 */}
         {messages.length === 1 &&
           messages[0].content.includes('자동 종료') && (
             <div className="text-center mt-4">
@@ -141,7 +141,7 @@ export default function ChatPage() {
             </div>
           )}
 
-        {/* 🔁 초기 메시지일 경우 추천 질문 */}
+        {/* 추천 질문 */}
         {messages.length === 1 && !loading && (
           <div className="mt-2">
             <ChatSuggestions onSelect={handleSuggestion} />
@@ -149,17 +149,17 @@ export default function ChatPage() {
         )}
       </div>
 
-      {/* 입력창 */}
+      {/* 입력창 - safe area 반영 */}
       {!(messages.length === 1 && messages[0].content.includes('자동 종료')) && (
-        <div className="fixed bottom-20 left-1/2 -translate-x-1/2 w-full px-4">
+        <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+80px)] left-1/2 -translate-x-1/2 w-full px-4 z-20">
           <div className="max-w-md mx-auto w-full">
             <ChatInput value={input} onChange={setInput} onSend={handleSend} />
           </div>
         </div>
       )}
 
-      {/* 하단 네비게이션 */}
-      <div className="fixed bottom-0 w-full">
+      {/* Footer Nav */}
+      <div className="fixed bottom-0 w-full z-10">
         <FooterNav />
       </div>
 

@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import classNames from 'classnames';
+import TimetableDeleteModal from '@/components/modals/TimetableDeleteModal';
 
 interface Subject {
   name: string;
@@ -17,7 +18,6 @@ interface TimetableProps {
   onEdit?: (subject: Subject) => void;
 }
 
-
 const days = ['월', '화', '수', '목', '금'];
 const timeSlots = Array.from({ length: 36 }, (_, i) => {
   const totalMinutes = 9 * 60 + i * 15; // 09:00 ~ 18:00
@@ -31,14 +31,44 @@ const colorPalette = [
   'bg-pink-300', 'bg-indigo-300', 'bg-orange-300', 'bg-teal-300', 'bg-emerald-300'
 ];
 
-export default function Timetable({ subjects }: TimetableProps) {
+export default function Timetable({ subjects, onEdit }: TimetableProps) {
+  const [selected, setSelected] = useState<Subject | null>(null);
+
   const getTimeIndex = (time: string) => {
     const [h, m] = time.split(':').map(Number);
     return ((h * 60 + m) - 540) / 15; // 540 = 9*60, 시작시간 offset
   };
 
+  const handleDelete = async (subject: Subject) => {
+    try {
+      const res = await fetch('/timetable/delete', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${localStorage.getItem('token') || ''}`,
+        },
+        body: JSON.stringify({
+          subject: subject.name,
+          day: subject.day,
+          start_time: subject.start_time,
+        }),
+      });
+
+      const result = await res.json();
+      if (result.success) {
+        setSelected(null);
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        alert('삭제 실패: ' + result.error);
+      }
+    } catch (err) {
+      alert('네트워크 오류로 삭제에 실패했어요.');
+      console.error(err);
+    }
+  };
+
   return (
-    <div className="w-full border rounded-lg overflow-hidden text-xs">
+    <div className="w-full border rounded-lg overflow-hidden text-xs relative">
       {/* Header */}
       <div className="grid grid-cols-6 border-b bg-gray-100 text-center font-semibold">
         <div className="py-2">시간</div>
@@ -71,7 +101,7 @@ export default function Timetable({ subjects }: TimetableProps) {
 
             return (
               <div
-                key={day}
+                key={`${day}-${i}`}
                 className={classNames(
                   'absolute left-0 top-0 px-2 py-1 text-white text-xs rounded cursor-pointer',
                   bgColor
@@ -79,10 +109,10 @@ export default function Timetable({ subjects }: TimetableProps) {
                 style={{
                   gridColumn: colIdx + 2,
                   gridRow: i + 1,
-                  height: `${span * 2}rem`, // 1칸 = 2rem
+                  height: `${span * 2}rem`,
                   zIndex: 10,
                 }}
-                // 다음 단계: onClick으로 수정 모달 열기
+                onClick={() => setSelected(matched)}
               >
                 <div className="font-semibold">{matched.name}</div>
                 {matched.professor && <div className="text-[11px]">{matched.professor}</div>}
@@ -92,6 +122,21 @@ export default function Timetable({ subjects }: TimetableProps) {
           })}
         </div>
       ))}
+
+      {selected && (
+  <TimetableDeleteModal
+    visible={!!selected}
+    onClose={() => setSelected(null)}
+    onConfirm={() => handleDelete(selected)}
+    subjectName={selected.name}
+    subjectData={{
+      name: selected.name,
+      day: selected.day,
+      start_time: selected.start_time,
+    }}
+  />
+)}
+
     </div>
   );
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { authFetch } from '@/lib/api/authFetch';
 
 interface AddSubjectModalProps {
   onAdd: (subject: any) => void;
@@ -25,9 +26,38 @@ export default function AddSubjectModal({ onAdd, onClose }: AddSubjectModalProps
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = () => {
-    if (!form.name || !form.day || !form.start || !form.end) return;
-    onAdd(form);
+  const handleSubmit = async () => {
+    if (!form.name || !form.day || !form.start || !form.end || !form.professor || !form.location) {
+      alert('모든 필드를 입력해주세요.');
+      return;
+    }
+
+    try {
+      const res = await authFetch('/timetable/add', {
+        method: 'POST',
+        body: JSON.stringify({
+          subject: form.name,
+          day: form.day,
+          start_time: `${form.start}:00`,
+          end_time: `${form.end}:00`,
+          professor: form.professor,
+          location: form.location,
+        }),
+      });
+
+      const result = await res.json();
+
+      if (!res.ok || !result.success) {
+        alert(result.error || '저장 중 오류 발생');
+        return;
+      }
+
+      onAdd(result.timetable);
+      onClose();
+    } catch (err) {
+      alert('서버 요청 실패');
+      console.error(err);
+    }
   };
 
   return (

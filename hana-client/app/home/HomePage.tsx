@@ -12,26 +12,19 @@ import { format, isWithinInterval, parseISO, isAfter, isToday } from 'date-fns';
 import { authFetch } from '@/lib/api/authFetch';
 import { USER_ME_ENDPOINT } from '@/lib/constants';
 
-const todayClasses = [
-  {
-    time: '11:30 ~ 13:00',
-    subject: '마케팅',
-    professor: '서현석 교수님',
-    location: '310관 205호',
-  },
-  {
-    time: '15:00 ~ 16:15',
-    subject: '회계원리',
-    professor: '김민지 교수님',
-    location: '101관 201호',
-  },
-];
+interface ClassInfo {
+  time: string;
+  subject: string;
+  professor: string;
+  location: string;
+}
 
-  function HomePage() {
+function HomePage() {
   const searchParams = useSearchParams();
   const [showModal, setShowModal] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [faculty, setFaculty] = useState<string | null>(null);
+  const [todayClasses, setTodayClasses] = useState<ClassInfo[]>([]);
 
   const today = new Date();
   const upcomingSchedules = academicSchedules
@@ -39,29 +32,61 @@ const todayClasses = [
     .slice(0, 5);
 
   useEffect(() => {
-  const fetchUserInfo = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) return;
+    const fetchUserInfo = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
 
-    try {
-      const res = await authFetch(USER_ME_ENDPOINT);
-      if (!res.ok) throw new Error('응답 오류');
+      try {
+        const res = await authFetch(USER_ME_ENDPOINT);
+        if (!res.ok) throw new Error('응답 오류');
 
-      const data = await res.json();
-      setUserName(data.nickname);
-      setFaculty(data.faculty);
-    } catch (err) {
-      console.error('사용자 정보 로딩 실패:', err);
+        const data = await res.json();
+        setUserName(data.nickname);
+        setFaculty(data.faculty);
+      } catch (err) {
+        console.error('사용자 정보 로딩 실패:', err);
+      }
+    };
+
+    const fetchTodayClasses = async () => {
+      const getKoreanDay = (date: Date): string => {
+        const days = ['일', '월', '화', '수', '목', '금', '토'];
+        return days[date.getDay()];
+      };
+
+      const todayKoreanDay = getKoreanDay(today);
+      if (todayKoreanDay === '일' || todayKoreanDay === '토') {
+        setTodayClasses([]);
+        return;
+      }
+
+      try {
+        const res = await authFetch('/timetable/list');
+        if (!res.ok) throw new Error('시간표 불러오기 실패');
+        const data = await res.json();
+        const timetable = data.timetable;
+
+        const classesToday = timetable.filter((cls: any) => cls.day === todayKoreanDay).map((cls: any) => ({
+          time: `${cls.start_time} ~ ${cls.end_time}`,
+          subject: cls.subject,
+          professor: `${cls.professor} 교수님`,
+          location: cls.location,
+        }));
+
+        setTodayClasses(classesToday);
+      } catch (err) {
+        console.error('❌ 오늘 강의 로딩 실패:', err);
+      }
+    };
+
+    fetchUserInfo();
+    fetchTodayClasses();
+
+    if (searchParams.get('joined') === 'true') {
+      setShowModal(true);
+      setTimeout(() => setShowModal(false), 3000);
     }
-  };
-
-  fetchUserInfo();
-
-  if (searchParams.get('joined') === 'true') {
-    setShowModal(true);
-    setTimeout(() => setShowModal(false), 3000);
-  }
-}, [searchParams]); // ✅ useEffect 닫힘
+  }, [searchParams]);
 
   return (
     <main className="min-h-screen font-pretendard bg-[#F9FAFB] pb-24">
@@ -117,19 +142,23 @@ const todayClasses = [
           {/* ✅ 오늘 강의 */}
           <section className="space-y-2">
             <h3 className="text-sm font-semibold mb-3 text-gray-700">오늘 강의</h3>
-            {todayClasses.map((cls, index) => (
-              <div
-                key={index}
-                className="bg-white rounded-md p-4 shadow-sm text-sm space-y-1"
-              >
-                <p className="font-semibold">
-                  {cls.time} <span className="text-sky-500">{cls.subject}</span>
-                </p>
-                <p className="text-gray-700 text-xs">
-                  {cls.professor} · {cls.location}
-                </p>
-              </div>
-            ))}
+            {todayClasses.length === 0 ? (
+              <p className="text-sm text-gray-500">오늘 수업이 없어요.</p>
+            ) : (
+              todayClasses.map((cls, index) => (
+                <div
+                  key={index}
+                  className="bg-white rounded-md p-4 shadow-sm text-sm space-y-1"
+                >
+                  <p className="font-semibold">
+                    {cls.time} <span className="text-sky-500">{cls.subject}</span>
+                  </p>
+                  <p className="text-gray-700 text-xs">
+                    {cls.professor} · {cls.location}
+                  </p>
+                </div>
+              ))
+            )}
           </section>
 
           {/* ✅ 학식 */}

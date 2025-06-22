@@ -11,6 +11,7 @@ import { academicSchedules } from '@/lib/data/academicSchedules';
 import { format, isWithinInterval, parseISO, isAfter, isToday } from 'date-fns';
 import { authFetch } from '@/lib/api/authFetch';
 import { USER_ME_ENDPOINT } from '@/lib/constants';
+import { t } from '@/lib/utils/translate';
 
 interface ClassInfo {
   time: string;
@@ -24,6 +25,8 @@ function HomePage() {
   const [showModal, setShowModal] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   const [faculty, setFaculty] = useState<string | null>(null);
+  const [nativeLanguage, setNativeLanguage] = useState<string>('ko');
+  const [translateOn, setTranslateOn] = useState(false);
   const [todayClasses, setTodayClasses] = useState<ClassInfo[]>([]);
 
   const today = new Date();
@@ -32,6 +35,9 @@ function HomePage() {
     .slice(0, 5);
 
   useEffect(() => {
+    const saved = localStorage.getItem('translate');
+    if (saved === 'true') setTranslateOn(true);
+
     const fetchUserInfo = async () => {
       const token = localStorage.getItem('token');
       if (!token) return;
@@ -43,6 +49,7 @@ function HomePage() {
         const data = await res.json();
         setUserName(data.nickname);
         setFaculty(data.faculty);
+        setNativeLanguage(data.native_language);
       } catch (err) {
         console.error('사용자 정보 로딩 실패:', err);
       }
@@ -66,12 +73,14 @@ function HomePage() {
         const data = await res.json();
         const timetable = data.timetable;
 
-        const classesToday = timetable.filter((cls: any) => cls.day === todayKoreanDay).map((cls: any) => ({
-          time: `${cls.start_time} ~ ${cls.end_time}`,
-          subject: cls.subject,
-          professor: `${cls.professor} 교수님`,
-          location: cls.location,
-        }));
+        const classesToday = timetable
+          .filter((cls: any) => cls.day === todayKoreanDay)
+          .map((cls: any) => ({
+            time: `${cls.start_time} ~ ${cls.end_time}`,
+            subject: cls.subject,
+            professor: `${cls.professor} ${t('교수님', nativeLanguage)}`,
+            location: cls.location,
+          }));
 
         setTodayClasses(classesToday);
       } catch (err) {
@@ -105,7 +114,9 @@ function HomePage() {
 
           {/* ✅ 학사일정 섹션 */}
           <section>
-            <h3 className="text-sm font-semibold mb-3 text-gray-700">학사일정</h3>
+            <h3 className="text-sm font-semibold mb-3 text-gray-700">
+              {translateOn ? t('학사일정', nativeLanguage) : '학사일정'}
+            </h3>
             <div className="flex gap-3 overflow-x-auto pb-1">
               {upcomingSchedules.map((schedule, i) => {
                 const start = parseISO(schedule.start);
@@ -121,7 +132,9 @@ function HomePage() {
                         : 'bg-gray-100 border-gray-200 text-gray-700'}
                     `}
                   >
-                    <p className="mb-2">{schedule.title}</p>
+                    <p className="mb-2">
+                      {translateOn ? t(schedule.title, nativeLanguage) : schedule.title}
+                    </p>
                     <p className="text-xs font-medium text-gray-500">
                       {format(start, 'MM.dd')} ~ {format(end, 'MM.dd')}
                     </p>
@@ -133,7 +146,9 @@ function HomePage() {
 
           {/* ✅ 지도 */}
           <section>
-            <h3 className="text-sm font-semibold mb-3 text-gray-700">우리학교 지도</h3>
+            <h3 className="text-sm font-semibold mb-3 text-gray-700">
+              {translateOn ? t('우리학교 지도', nativeLanguage) : '우리학교 지도'}
+            </h3>
             <div className="rounded-md overflow-hidden shadow">
               <CampusMap />
             </div>
@@ -141,9 +156,13 @@ function HomePage() {
 
           {/* ✅ 오늘 강의 */}
           <section className="space-y-2">
-            <h3 className="text-sm font-semibold mb-3 text-gray-700">오늘 강의</h3>
+            <h3 className="text-sm font-semibold mb-3 text-gray-700">
+              {translateOn ? t('오늘 강의', nativeLanguage) : '오늘 강의'}
+            </h3>
             {todayClasses.length === 0 ? (
-              <p className="text-sm text-gray-500">오늘 수업이 없어요.</p>
+              <p className="text-sm text-gray-500">
+                {translateOn ? t('오늘 수업이 없어요.', nativeLanguage) : '오늘 수업이 없어요.'}
+              </p>
             ) : (
               todayClasses.map((cls, index) => (
                 <div
@@ -163,7 +182,9 @@ function HomePage() {
 
           {/* ✅ 학식 */}
           <section className="space-y-3">
-            <h3 className="text-sm font-semibold mb-3 text-gray-700">오늘의 학식</h3>
+            <h3 className="text-sm font-semibold mb-3 text-gray-700">
+              {translateOn ? t('오늘의 학식', nativeLanguage) : '오늘의 학식'}
+            </h3>
             {[{
               title: '310관 지하식당 점심',
               menu: '김치찌개, 순두부찌개, 치킨가스, 기름떡볶이, 두부무침, 잡채',
@@ -175,7 +196,9 @@ function HomePage() {
                 key={index}
                 className="bg-white rounded-md p-4 shadow-sm text-xs leading-relaxed"
               >
-                <p className="font-semibold mb-1 text-sky-500">{meal.title}</p>
+                <p className="font-semibold mb-1 text-sky-500">
+                  {translateOn ? t(meal.title, nativeLanguage) : meal.title}
+                </p>
                 <p>{meal.menu}</p>
               </div>
             ))}

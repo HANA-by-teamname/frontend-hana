@@ -1,18 +1,27 @@
 'use client';
 
-import { useRef, useEffect } from 'react';
-import SessionModal from './SessionModal';
+import { useState, useRef, useEffect } from 'react';
+import SessionExpiredModal from '@/components/modals/SessionExpiredModal';
 import { useSessionModal } from '@/contexts/SessionModalContext';
+import { setSessionModalInstance } from '@/lib/sessionModalInstance';
 
 export default function SessionModalWrapper() {
+  const [visible, setVisible] = useState(false);
   const modalRef = useRef<{ showModal: () => void }>(null);
   const { setInstance } = useSessionModal();
 
   useEffect(() => {
-    if (modalRef.current) {
-      setInstance(modalRef.current); // 🔑 여기 중요
-    }
+    const controller = {
+      showModal: () => setVisible(true),
+    };
+    setInstance(controller);
+    setSessionModalInstance(controller);
   }, []);
 
-  return <SessionModal ref={modalRef} />;
+  return (
+    <SessionExpiredModal
+      visible={visible}
+      onClose={() => setVisible(false)}
+    />
+  );
 }

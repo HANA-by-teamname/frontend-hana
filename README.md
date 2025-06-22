@@ -62,28 +62,6 @@ hana\_client/
 ---
 
 
----
-
-## 🎨 화면 구성
-
-| 화면 이름 | 미리보기 |
-|-----------|----------|
-| 스프린트 | ![](./asset/sprint.png) |
-| 로그인 화면 | ![](./asset/login.png) |
-| 오류 안내 | ![](./asset/error.png) |
-| 회원가입 선택 화면 | ![](./asset/signup_select.png) |
-| 회원가입 온보딩 화면 | ![](./asset/signup_onboarding.png) |
-| 홈 화면 | ![](./asset/home.png) |
-| 검색 | ![](./asset/search.png) |
-| 검색 필터 | ![](./asset/search_filter.png) |
-| 챗봇 | ![](./asset/chatbot.png) |
-| 마이페이지 - 재학생 인증 | ![](./asset/mypage_auth.png) |
-| 시간표 등록 | ![](./asset/timetable.png) |
-| 카카오톡 연동 | ![](./asset/kakao.png) |
-
----
-
-
 ## 🚀 실행 가이드
 
 ```bash

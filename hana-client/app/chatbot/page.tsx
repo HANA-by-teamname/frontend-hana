@@ -7,57 +7,81 @@ import ChatSuggestions from '@/components/chat/ChatSuggestion';
 import FooterNav from '@/components/FooterNav';
 import ChatHeader from '@/components/headers/ChatHeader';
 import SessionExpiredModal from '@/components/modals/SessionExpiredModal';
-import { authFetch } from '@/lib/api/authFetch';
+import { sendChatbotMessage, fetchChatHistory } from '@/lib/api/chatbot';
 
 interface Message {
   role: 'user' | 'bot';
   content: string;
+  createdAt?: string;
 }
 
 export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [showSessionExpired, setShowSessionExpired] = useState(false);
+  const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const checkToken = async () => {
+    const init = async () => {
       try {
-        const res = await authFetch('/users/me');
-        if (!res.ok) throw new Error('세션 없음');
+        const history = await fetchChatHistory();
+        const formatted = history.flatMap((h: any) => [
+          { role: 'user', content: h.message, createdAt: h.createdAt },
+          { role: 'bot', content: h.answer, createdAt: h.createdAt },
+        ]);
+        setMessages([{ role: 'bot', content: '반가워요!' }, ...formatted]);
       } catch (err) {
         console.error('❌ 인증 실패:', err);
         setShowSessionExpired(true);
+        setMessages([{ role: 'bot', content: '반가워요!' }]);
       }
     };
-    checkToken();
-    setMessages([{ role: 'bot', content: '반가워요!' }]);
+    init();
   }, []);
 
-  const sendMessage = (text: string) => {
-    const trimmed = text.trim();
-    if (!trimmed) return;
-
-    const userMessage: Message = { role: 'user', content: trimmed };
-    const botReply: Message = {
-      role: 'bot',
-      content: `"${trimmed}"에 대한 답변은 준비 중이에요.`,
-    };
-
-    setMessages((prev) => [...prev, userMessage, botReply]);
-  };
-
-  const handleSend = () => {
+  const handleSend = async () => {
     const trimmed = input.trim();
     if (!trimmed) return;
 
+    const userMessage: Message = { role: 'user', content: trimmed };
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
-    sendMessage(trimmed);
+    setLoading(true);
+
+    try {
+      const reply = await sendChatbotMessage(trimmed);
+      const botMessage: Message = { role: 'bot', content: reply };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (err) {
+      console.error('❌ 챗봇 응답 실패:', err);
+      setMessages((prev) => [
+        ...prev,
+        { role: 'bot', content: '⚠️ 답변을 불러오지 못했습니다.' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const handleSuggestion = (text: string) => {
+  const handleSuggestion = async (text: string) => {
     setInput('');
-    sendMessage(text);
+    setLoading(true);
+    const userMessage: Message = { role: 'user', content: text };
+    setMessages((prev) => [...prev, userMessage]);
+
+    try {
+      const reply = await sendChatbotMessage(text);
+      const botMessage: Message = { role: 'bot', content: reply };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: 'bot', content: '⚠️ 답변을 불러오지 못했습니다.' },
+      ]);
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -72,6 +96,9 @@ export default function ChatPage() {
           {messages.map((msg, i) => (
             <ChatBubble key={i} role={msg.role} content={msg.content} />
           ))}
+          {loading && (
+            <ChatBubble role="bot" content="답변을 생성 중이에요..." />
+          )}
           <div ref={bottomRef} />
         </div>
         {messages.length === 1 && (

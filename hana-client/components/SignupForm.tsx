@@ -158,7 +158,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
             />
             {isSocial && (
               <p className="text-xs text-gray-500 mt-1">
-                소셜 계정으로 가입 중입니다. 비밀번호 입력은 생략됩니다.
+                소셜 계정으로 가입 중입니다.
               </p>
             )}
           </div>

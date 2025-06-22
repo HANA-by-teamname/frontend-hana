@@ -5,7 +5,11 @@ import Image from 'next/image';
 import ChatLanguageModal from '@/components/modals/ChatLanguageModal';
 import { authFetch } from '@/lib/api/authFetch';
 
-export default function ChatHeader() {
+interface ChatHeaderProps {
+  onHistoryClick?: () => void; // ✅ 새로 추가
+}
+
+export default function ChatHeader({ onHistoryClick }: ChatHeaderProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [defaultLang, setDefaultLang] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -17,7 +21,6 @@ export default function ChatHeader() {
         if (!token) throw new Error('토큰 없음');
 
         const res = await authFetch('/users/me');
-
         if (!res.ok) throw new Error(`응답 실패: ${res.status}`);
 
         const user = await res.json();
@@ -36,9 +39,7 @@ export default function ChatHeader() {
 
   const handleLangChange = async (newLang: string) => {
     try {
-      const token = localStorage.getItem('token');
       const res = await authFetch('/users/lang');
-
       if (!res.ok) throw new Error('❌ 언어 변경 실패');
 
       setDefaultLang(newLang);
@@ -61,15 +62,30 @@ export default function ChatHeader() {
               : '사용자 정보를 찾을 수 없습니다.'}
           </p>
         </div>
-        <button onClick={() => setIsModalOpen(true)}>
-          <Image
-            src="/icons/Settings.svg"
-            alt="설정"
-            width={24}
-            height={24}
-            className="hover:opacity-80 transition"
-          />
-        </button>
+
+        <div className="flex items-center gap-3">
+          {/* 히스토리 버튼 */}
+          <button onClick={onHistoryClick}>
+            <Image
+              src="/icons/Hamburger Menu.svg"
+              alt="히스토리"
+              width={24}
+              height={24}
+              className="hover:opacity-80 transition"
+            />
+          </button>
+
+          {/* 설정 버튼 */}
+          <button onClick={() => setIsModalOpen(true)}>
+            <Image
+              src="/icons/Settings.svg"
+              alt="설정"
+              width={24}
+              height={24}
+              className="hover:opacity-80 transition"
+            />
+          </button>
+        </div>
       </div>
 
       {isModalOpen && (

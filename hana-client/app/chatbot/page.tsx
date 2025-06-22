@@ -6,6 +6,7 @@ import ChatBubble from '@/components/chat/ChatBubble';
 import ChatSuggestions from '@/components/chat/ChatSuggestion';
 import FooterNav from '@/components/FooterNav';
 import ChatHeader from '@/components/headers/ChatHeader';
+import ChatHistoryModal from '@/components/modals/ChatHistoryModal'; // ✅ 추가
 import SessionExpiredModal from '@/components/modals/SessionExpiredModal';
 import { sendChatbotMessage, fetchChatHistory } from '@/lib/api/chatbot';
 
@@ -19,6 +20,7 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [showSessionExpired, setShowSessionExpired] = useState(false);
+  const [showHistoryModal, setShowHistoryModal] = useState(false); // ✅ 추가
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
 
@@ -91,7 +93,7 @@ export default function ChatPage() {
   return (
     <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-24">
       <div className="w-full max-w-md mx-auto px-4 pt-6 space-y-4">
-        <ChatHeader />
+        <ChatHeader onHistoryClick={() => setShowHistoryModal(true)} />
         <div className="space-y-4">
           {messages.map((msg, i) => (
             <ChatBubble key={i} role={msg.role} content={msg.content} />
@@ -122,6 +124,10 @@ export default function ChatPage() {
         visible={showSessionExpired}
         onClose={() => setShowSessionExpired(false)}
       />
+
+      {showHistoryModal && (
+        <ChatHistoryModal onClose={() => setShowHistoryModal(false)} />
+      )}
     </main>
   );
 }

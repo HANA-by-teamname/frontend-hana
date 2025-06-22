@@ -199,7 +199,11 @@ function HomePage() {
                 <p className="font-semibold mb-1 text-sky-500">
                   {translateOn ? t(meal.title, nativeLanguage) : meal.title}
                 </p>
-                <p>{meal.menu}</p>
+                <p>
+                  {translateOn
+                    ? meal.menu.split(', ').map((item) => t(item, nativeLanguage)).join(', ')
+                    : meal.menu}
+                </p>
               </div>
             ))}
           </section>

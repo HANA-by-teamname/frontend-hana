@@ -1,64 +1,52 @@
 'use client';
 
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import { authFetch } from '@/lib/api/authFetch';
 import ChatBubble from '@/components/chat/ChatBubble';
-import { ArrowLeftCircle } from 'lucide-react';
+import { authFetch } from '@/lib/api/authFetch';
 
-interface Message {
-  role: 'user' | 'bot';
-  content: string;
-  createdAt?: string;
+interface ChatLog {
+  message: string;
+  answer: string;
+  createdAt: string;
 }
 
-export default function ChatHistoryPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
+export default function ChatHistoryDetailPage() {
+  const [logs, setLogs] = useState<ChatLog[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const { chatId } = useParams();
-  const bottomRef = useRef<HTMLDivElement>(null);
+  const params = useParams();
+  const chatid = parseInt(params.chatid as string);
 
   useEffect(() => {
-    const fetchHistory = async () => {
+    const fetchLogs = async () => {
       try {
         const res = await authFetch('/chatbot/history');
         const data = await res.json();
         if (!data.success) throw new Error('이력 조회 실패');
 
-        const all = data.history;
-        const sessions = splitIntoSessions(all);
-        const sessionIndex = parseInt(chatId as string);
-        if (isNaN(sessionIndex) || sessionIndex < 0 || sessionIndex >= sessions.length) {
-          throw new Error('유효하지 않은 세션 인덱스');
-        }
-        const session = sessions[sessionIndex];
-
-        const formatted: Message[] = session.flatMap((h: any) => [
-          { role: 'user', content: h.message, createdAt: h.createdAt },
-          { role: 'bot', content: h.answer, createdAt: h.createdAt },
-        ]);
-
-        setMessages(formatted);
+        const allLogs: ChatLog[] = data.history;
+        const grouped = splitIntoSessions(allLogs);
+        setLogs(grouped[chatid] || []);
       } catch (err) {
-        console.error('❌ 채팅 세션 로딩 실패:', err);
-        router.push('/chat');
+        console.error('❌ 기록 불러오기 실패:', err);
       } finally {
         setLoading(false);
       }
     };
-    fetchHistory();
-  }, [chatId]);
+    fetchLogs();
+  }, [chatid]);
 
-  const splitIntoSessions = (messages: any[], gapMinutes = 30) => {
-    const sessions: any[][] = [];
-    let current: any[] = [];
+  const splitIntoSessions = (messages: ChatLog[], gapMinutes = 30) => {
+    const sessions: ChatLog[][] = [];
+    let current: ChatLog[] = [];
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i];
       const prev = messages[i - 1];
       if (
         i === 0 ||
-        new Date(msg.createdAt).getTime() - new Date(prev.createdAt).getTime() < gapMinutes * 60 * 1000
+        new Date(msg.createdAt).getTime() - new Date(prev.createdAt).getTime() <
+          gapMinutes * 60 * 1000
       ) {
         current.push(msg);
       } else {
@@ -70,32 +58,31 @@ export default function ChatHistoryPage() {
     return sessions;
   };
 
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'auto' });
-  }, [messages]);
-
   return (
-    <main className="min-h-screen bg-[#EEF0F3] font-pretendard pb-20">
-      <div className="w-full max-w-md mx-auto px-4 pt-6 space-y-4">
-        <div className="flex items-center space-x-2 mb-2">
-          <ArrowLeftCircle
-            onClick={() => router.push('/chat')}
-            className="w-6 h-6 text-gray-600 cursor-pointer hover:text-gray-800"
-          />
-          <h2 className="text-lg font-semibold text-gray-800">이전 대화 보기</h2>
-        </div>
+    <main className="min-h-screen bg-[#F9FAFB] font-pretendard pb-20 px-4 pt-6 max-w-md mx-auto">
+      <button
+        onClick={() => router.back()}
+        className="text-sm text-blue-500 mb-4 hover:underline"
+      >
+        ← 뒤로가기
+      </button>
 
+      <h2 className="text-lg font-semibold mb-4">이전 채팅 보기</h2>
+
+      {loading ? (
+        <p>불러오는 중...</p>
+      ) : logs.length === 0 ? (
+        <p className="text-gray-500">기록이 없습니다.</p>
+      ) : (
         <div className="space-y-4">
-          {loading ? (
-            <p>로딩 중...</p>
-          ) : (
-            messages.map((msg, i) => (
-              <ChatBubble key={i} role={msg.role} content={msg.content} />
-            ))
-          )}
-          <div ref={bottomRef} />
+          {logs.map((log, index) => (
+            <div key={index} className="space-y-2">
+              <ChatBubble role="user" content={log.message} />
+              <ChatBubble role="bot" content={log.answer} />
+            </div>
+          ))}
         </div>
-      </div>
+      )}
     </main>
   );
 }

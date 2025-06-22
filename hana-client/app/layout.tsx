@@ -1,4 +1,5 @@
 // ✅ /app/layout.tsx
+
 import './globals.css';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
@@ -12,6 +13,7 @@ const SessionModalWrapper = dynamic(() => import('@/components/SessionModalWrapp
 export const metadata: Metadata = {
   title: 'HANA',
   description: '하나뿐인 유학생활을 위한 서비스',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no', // ✅ 줌 방지 설정
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
@@ -19,7 +21,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ko">
       <body className="bg-[#F5F6FA] font-pretendard">
         <SessionModalProvider>
-          <SessionModalWrapper /> {/* ✅ 먼저 마운트 */}
+          <SessionModalWrapper />
           <UserProvider>
             <div className="max-w-iphone mx-auto min-h-screen bg-white">
               {children}

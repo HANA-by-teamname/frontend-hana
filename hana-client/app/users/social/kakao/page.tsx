@@ -56,11 +56,11 @@ export default function KakaoCallbackPage() {
   }, [code, backendURL, router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4 text-center">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4 text-center font-pretendard text-gray-700">
       {!hasError ? (
         <>
-          <div className="animate-spin rounded-full h-14 w-14 border-4 border-blue-300 border-t-blue-600 mb-6" />
-          <p className="text-blue-700 text-base font-medium">{statusMessage}</p>
+          <div className="animate-spin rounded-full h-14 w-14 border-4 border-gray-300 border-t-gray-600 mb-6" />
+          <p className="text-base font-medium">{statusMessage}</p>
         </>
       ) : (
         <>

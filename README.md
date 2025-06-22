@@ -16,27 +16,6 @@
       </a><br/>
       프론트엔드 리드
     </td>
-    <td align="center">
-      <a href="https://github.com/harry-nb">
-        <img src="https://github.com/harry-nb.png" width="100" style="border-radius: 50%"/><br/>
-        <strong>김도현</strong>
-      </a><br/>
-      PM
-    </td>
-    <td align="center">
-      <a href="https://github.com/dmkang1225">
-        <img src="https://github.com/dmkang1225.png" width="100" style="border-radius: 50%"/><br/>
-        <strong>강동민</strong>
-      </a><br/>
-      백엔드 개발
-    </td>
-    <td align="center">
-      <a href="https://github.com/EuiInSeong">
-        <img src="https://github.com/EuiInSeong.png" width="100" style="border-radius: 50%"/><br/>
-        <strong>성의인</strong>
-      </a><br/>
-      AI
-    </td>
   </tr>
 </table>
 

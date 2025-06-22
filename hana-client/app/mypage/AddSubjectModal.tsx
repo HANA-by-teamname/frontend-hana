@@ -9,50 +9,80 @@ interface AddSubjectModalProps {
 }
 
 const days = ['월', '화', '수', '목', '금'];
-const times = Array.from({ length: 10 }, (_, i) => 9 + i); // 9 ~ 18
+const times = Array.from({ length: 40 }, (_, i) => {
+  const hour = Math.floor((540 + i * 15) / 60); // 540 = 9*60
+  const minute = (i * 15) % 60;
+  return `${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+});
 
 export default function AddSubjectModal({ onAdd, onClose }: AddSubjectModalProps) {
   const [form, setForm] = useState({
     name: '',
-    day: '',
-    start: '',
-    end: '',
     professor: '',
     location: '',
+    times: [{ day: '', start: '', end: '' }],
   });
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleTimeChange = (index: number, field: string, value: string) => {
+    setForm((prev) => {
+      const updated = [...prev.times];
+      updated[index][field as 'day' | 'start' | 'end'] = value;
+      return { ...prev, times: updated };
+    });
+  };
+
+  const addTimeBlock = () => {
+    setForm((prev) => ({ ...prev, times: [...prev.times, { day: '', start: '', end: '' }] }));
+  };
+
+  const removeTimeBlock = (index: number) => {
+    setForm((prev) => ({
+      ...prev,
+      times: prev.times.filter((_, i) => i !== index),
+    }));
+  };
+
   const handleSubmit = async () => {
-    if (!form.name || !form.day || !form.start || !form.end || !form.professor || !form.location) {
+    const { name, professor, location, times } = form;
+
+    if (!name || !professor || !location || times.some(t => !t.day || !t.start || !t.end)) {
       alert('모든 필드를 입력해주세요.');
       return;
     }
 
     try {
-      const res = await authFetch('/timetable/add', {
-        method: 'POST',
-        body: JSON.stringify({
-          subject: form.name,
-          day: form.day,
-          start_time: `${form.start}:00`,
-          end_time: `${form.end}:00`,
-          professor: form.professor,
-          location: form.location,
-        }),
-      });
+      const createdSubjects: any[] = [];
 
-      const result = await res.json();
+      for (const t of times) {
+        const res = await authFetch('/timetable/add', {
+          method: 'POST',
+          body: JSON.stringify({
+            subject: name,
+            day: t.day,
+            start_time: t.start,
+            end_time: t.end,
+            professor,
+            location,
+          }),
+        });
 
-      if (!res.ok || !result.success) {
-        alert(result.error || '저장 중 오류 발생');
-        return;
+        const result = await res.json();
+
+        if (!res.ok || !result.success) {
+          alert(result.error || '저장 중 오류 발생');
+          return;
+        }
+
+        createdSubjects.push(result.timetable);
       }
 
-      onAdd(result.timetable);
+      // 여러 개 반환
+      createdSubjects.forEach(onAdd);
       onClose();
     } catch (err) {
       alert('서버 요청 실패');
@@ -62,7 +92,7 @@ export default function AddSubjectModal({ onAdd, onClose }: AddSubjectModalProps
 
   return (
     <div className="fixed inset-0 bg-black/40 z-50 flex justify-center items-center">
-      <div className="bg-white rounded-lg p-6 w-80 shadow space-y-4">
+      <div className="bg-white rounded-lg p-6 w-[22rem] shadow space-y-4 max-h-[90vh] overflow-y-auto">
         <h2 className="text-lg font-semibold text-center">과목 추가하기</h2>
 
         <input
@@ -73,27 +103,58 @@ export default function AddSubjectModal({ onAdd, onClose }: AddSubjectModalProps
           className="w-full border px-3 py-2 text-sm rounded"
         />
 
-        <select name="day" value={form.day} onChange={handleChange} className="w-full border px-3 py-2 text-sm rounded">
-          <option value="">요일 선택</option>
-          {days.map((day) => (
-            <option key={day} value={day}>{day}</option>
-          ))}
-        </select>
+        {form.times.map((block, idx) => (
+          <div key={idx} className="space-y-1 border p-2 rounded bg-gray-50 relative">
+            {form.times.length > 1 && (
+              <button
+                onClick={() => removeTimeBlock(idx)}
+                className="absolute top-1 right-2 text-xs text-red-500"
+              >
+                ✕
+              </button>
+            )}
+            <select
+              value={block.day}
+              onChange={(e) => handleTimeChange(idx, 'day', e.target.value)}
+              className="w-full border px-3 py-2 text-sm rounded"
+            >
+              <option value="">요일 선택</option>
+              {days.map((day) => (
+                <option key={day} value={day}>{day}</option>
+              ))}
+            </select>
 
-        <div className="flex gap-2">
-          <select name="start" value={form.start} onChange={handleChange} className="w-1/2 border px-3 py-2 text-sm rounded">
-            <option value="">시작시간</option>
-            {times.map((t) => (
-              <option key={t} value={t}>{t}:00</option>
-            ))}
-          </select>
-          <select name="end" value={form.end} onChange={handleChange} className="w-1/2 border px-3 py-2 text-sm rounded">
-            <option value="">종료시간</option>
-            {times.map((t) => (
-              <option key={t} value={t}>{t}:00</option>
-            ))}
-          </select>
-        </div>
+            <div className="flex gap-2">
+              <select
+                value={block.start}
+                onChange={(e) => handleTimeChange(idx, 'start', e.target.value)}
+                className="w-1/2 border px-3 py-2 text-sm rounded"
+              >
+                <option value="">시작</option>
+                {times.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+              <select
+                value={block.end}
+                onChange={(e) => handleTimeChange(idx, 'end', e.target.value)}
+                className="w-1/2 border px-3 py-2 text-sm rounded"
+              >
+                <option value="">종료</option>
+                {times.map((t) => (
+                  <option key={t} value={t}>{t}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        ))}
+
+        <button
+          onClick={addTimeBlock}
+          className="w-full py-1 border rounded text-sm text-blue-500"
+        >
+          + 요일/시간 추가
+        </button>
 
         <input
           name="professor"

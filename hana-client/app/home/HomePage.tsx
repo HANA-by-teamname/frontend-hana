@@ -14,6 +14,7 @@ import { USER_ME_ENDPOINT } from '@/lib/constants';
 import { t } from '@/lib/utils/translate';
 // 최상단 import 부분에 아래 추가:
 import ForWorkSection from './ForWorkSection';
+import Link from 'next/link';
 
 interface ClassInfo {
   time: string;
@@ -158,21 +159,23 @@ function HomePage() {
             </div>
           </section> */}
 
-          {/* ✅ 한국에서 취업하기 - ForWorkSection으로 교체 */}
-          <ForWorkSection    
-          nativeLanguage={nativeLanguage}
-          translateOn={translateOn}  
-          />
-
           {/* ✅ 오늘 강의 */}
           <section className="space-y-2">
             <h3 className="text-sm font-semibold mb-3 text-gray-700">
               {translateOn ? t('오늘 강의', nativeLanguage) : '오늘 강의'}
             </h3>
             {todayClasses.length === 0 ? (
-              <p className="text-sm text-gray-500">
-                {translateOn ? t('오늘 수업이 없어요.', nativeLanguage) : '오늘 수업이 없어요.'}
-              </p>
+              <div className="text-sm text-gray-500 space-y-2">
+                <p>{translateOn ? t('오늘 수업이 없어요.', nativeLanguage) : '오늘 수업이 없어요.'}</p>
+                <Link
+                  href="/mypage"
+                  className="inline-block mt-1 px-3 py-1 text-xs rounded bg-blue-100 text-blue-700 hover:underline"
+                >
+                  {translateOn
+                    ? t('시간표를 등록하러 가기', nativeLanguage)
+                    : '시간표를 등록하러 가기'}
+                </Link>
+              </div>
             ) : (
               todayClasses.map((cls, index) => (
                 <div
@@ -188,6 +191,7 @@ function HomePage() {
                 </div>
               ))
             )}
+
           </section>
 
           {/* ✅ 학식 */}
@@ -217,6 +221,13 @@ function HomePage() {
               </div>
             ))}
           </section>
+
+                    {/* ✅ 한국에서 취업하기 - ForWorkSection으로 교체 */}
+          <ForWorkSection    
+          nativeLanguage={nativeLanguage}
+          translateOn={translateOn}  
+          />
+
         </div>
       </div>
 

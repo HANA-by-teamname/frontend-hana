@@ -203,7 +203,7 @@ const translations: Record<string, Record<string, string>> = {
   '❌ 오늘 강의 로딩 실패:': {
     en: '❌ Failed to load today’s classes:', ja: '❌ 今日の授業の読み込みに失敗:', zh: '❌ 今日课程加载失败：', vi: '❌ Tải lớp học hôm nay thất bại:',
   },
-  
+
   '더 많은 채용 정보가 궁금하다면?': {
     en: 'Want to see more job postings?',
     ja: 'もっと多くの求人情報が知りたいですか？',
@@ -212,6 +212,29 @@ const translations: Record<string, Record<string, string>> = {
     ko: '더 많은 채용 정보가 궁금하다면?',
   },
 
+  '더보기...': {
+    en: 'See more...',
+    ja: 'もっと見る...',
+    zh: '查看更多...',
+    vi: 'Xem thêm...',
+    ko: '더보기...',
+  },
+  
+  '한국에서 취업하기': {
+    en: 'Working in Korea',
+    ja: '韓国での就職',
+    zh: '在韩国工作',
+    vi: 'Làm việc tại Hàn Quốc',
+    ko: '한국에서 취업하기',
+  },
+
+'시간표를 등록하러 가기': {
+  ko: '시간표를 등록하러 가기',
+  en: 'Go to register your timetable',
+  ja: '時間割を登録しに行く',
+  zh: '去注册你的课程表',
+  vi: 'Đi đăng ký thời khóa biểu của bạn',
+}
 };
 
 export function t(text: string, lang: string, fallback = 'ko'): string {

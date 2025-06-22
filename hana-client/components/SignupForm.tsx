@@ -34,11 +34,9 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
   const [selectAll, setSelectAll] = useState(false);
   const [error, setError] = useState('');
 
-  const isSocial = !!provider;
-
   const canSubmit = !!(
     presetEmail &&
-    (isSocial || password) &&
+    password &&
     name &&
     nickname &&
     nicknameAvailable === true &&
@@ -116,7 +114,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
     if (!canSubmit) return;
     setError('');
 
-    const passwordToSend = isSocial ? `social-${provider}-${Date.now()}` : password;
+    const passwordToSend = password;
 
     try {
       const result = await signup({
@@ -143,7 +141,7 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
   };
 
   return (
-    <main className="min-h-screen bg-white flex flex-col justify-center items-center font-pretendard px-5 transition-all ease-in-out duration-300">
+    <main className="min-h-screen bg-white flex flex-col justify-center items-center font-pretendard px-5">
       <div className="w-full max-w-md">
         <h2 className="text font-bold text-center pt-8 mb-6">회원가입</h2>
 
@@ -156,25 +154,18 @@ export default function SignupForm({ presetEmail, provider }: SignupFormProps) {
               readOnly
               className="w-full border-b py-2 text-sm text-gray-400 bg-gray-50 cursor-not-allowed"
             />
-            {isSocial && (
-              <p className="text-xs text-gray-500 mt-1">
-                소셜 계정으로 가입 중입니다.
-              </p>
-            )}
           </div>
 
-          {!isSocial && (
-            <div>
-              <label className="block text-xs py-1 text-gray-700 mb-1">비밀번호 / Password / 密码</label>
-              <input
-                type="password"
-                placeholder="비밀번호를 입력해주세요"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full border-b py-2 text-sm"
-              />
-            </div>
-          )}
+          <div>
+            <label className="block text-xs py-1 text-gray-700 mb-1">비밀번호 / Password / 密码</label>
+            <input
+              type="password"
+              placeholder="비밀번호를 입력해주세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border-b py-2 text-sm"
+            />
+          </div>
 
           <div>
             <label className="block text-xs py-1 text-gray-700 mb-1">이름 / Name / 姓名</label>

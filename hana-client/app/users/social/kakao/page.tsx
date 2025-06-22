@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { ArrowLeftCircle } from 'lucide-react';
+
 export const dynamic = 'force-dynamic';
 
 export default function KakaoCallbackPage() {
@@ -13,13 +14,16 @@ export default function KakaoCallbackPage() {
   const [statusMessage, setStatusMessage] = useState('카카오 계정 확인 중입니다...');
   const [hasError, setHasError] = useState(false);
 
+  // ✅ .env에서 가져온 백엔드 URL
+  const backendURL = process.env.NEXT_PUBLIC_API_URL!;
+
   useEffect(() => {
     if (!code) return;
 
     const fetchKakaoUser = async () => {
       try {
         setStatusMessage('카카오 계정 인증 중...');
-        const res = await fetch(`http://localhost:4000/users/social/kakao?code=${code}`);
+        const res = await fetch(`${backendURL}/users/social/kakao?code=${code}`);
         const data = await res.json();
 
         if (data.success && data.token) {
@@ -37,7 +41,7 @@ export default function KakaoCallbackPage() {
           return;
         }
 
-        // 알 수 없는 응답 → 3초 후 에러 표시
+        // 알 수 없는 응답 → 12초 후 에러 표시
         setStatusMessage('잠시만 더 기다려주세요');
         setTimeout(() => setHasError(true), 12000);
       } catch (err) {
@@ -49,18 +53,16 @@ export default function KakaoCallbackPage() {
     };
 
     fetchKakaoUser();
-  }, [code, router]);
+  }, [code, backendURL, router]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white px-4 text-center">
-      {!hasError && (
+      {!hasError ? (
         <>
           <div className="animate-spin rounded-full h-14 w-14 border-4 border-blue-300 border-t-blue-600 mb-6" />
           <p className="text-blue-700 text-base font-medium">{statusMessage}</p>
         </>
-      )}
-
-      {hasError && (
+      ) : (
         <>
           <p className="text-red-600 text-base font-semibold mb-6">{statusMessage}</p>
           <button

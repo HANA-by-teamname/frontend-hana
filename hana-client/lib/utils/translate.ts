@@ -166,6 +166,44 @@ const translations: Record<string, Record<string, string>> = {
   '단무지': {
     en: 'Pickled radish', ja: 'たくあん', zh: '腌黄萝卜', vi: 'Củ cải muối',
   },
+   '홈': {
+    en: 'Home', ja: 'ホーム', zh: '首页', vi: 'Trang chủ',
+  },
+  '검색': {
+    en: 'Search', ja: '検索', zh: '搜索', vi: 'Tìm kiếm',
+  },
+  '채팅': {
+    en: 'Chat', ja: 'チャット', zh: '聊天', vi: 'Trò chuyện',
+  },
+  '찜': {
+    en: 'Favorites', ja: 'お気に入り', zh: '收藏', vi: 'Yêu thích',
+  },
+  '마이페이지': {
+    en: 'My Page', ja: 'マイページ', zh: '我的页面', vi: 'Trang cá nhân',
+  },
+
+    // ✅ HomeHeader 관련
+  '안녕하세요,': {
+    en: 'Hello,', ja: 'こんにちは、', zh: '你好，', vi: 'Xin chào,',
+  },
+  '님!': {
+    en: '!', ja: 'さん！', zh: '！', vi: '!',
+  },
+
+  // ✅ HomePage 추가
+  '응답 오류': {
+    en: 'Response error', ja: '応答エラー', zh: '响应错误', vi: 'Lỗi phản hồi',
+  },
+  '사용자 정보 로딩 실패:': {
+    en: 'Failed to load user info:', ja: 'ユーザー情報の読み込みに失敗:', zh: '加载用户信息失败：', vi: 'Tải thông tin người dùng thất bại:',
+  },
+  '시간표 불러오기 실패': {
+    en: 'Failed to load timetable', ja: '時間割の読み込みに失敗', zh: '加载课程表失败', vi: 'Tải thời khóa biểu thất bại',
+  },
+  '❌ 오늘 강의 로딩 실패:': {
+    en: '❌ Failed to load today’s classes:', ja: '❌ 今日の授業の読み込みに失敗:', zh: '❌ 今日课程加载失败：', vi: '❌ Tải lớp học hôm nay thất bại:',
+  },
+
 };
 
 export function t(text: string, lang: string, fallback = 'ko'): string {

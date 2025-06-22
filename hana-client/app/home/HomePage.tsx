@@ -210,7 +210,7 @@ function HomePage() {
         </div>
       </div>
 
-      <FooterNav />
+      <FooterNav nativeLanguage={nativeLanguage} translateOn={translateOn} />
     </main>
   );
 }

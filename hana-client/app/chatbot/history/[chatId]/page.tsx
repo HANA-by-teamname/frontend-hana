@@ -41,20 +41,24 @@ export default function ChatHistoryPage() {
   if (!session) return <p className="p-4 text-gray-500">해당 대화 내역을 찾을 수 없습니다.</p>;
 
   return (
-    <div className="p-4 space-y-4 font-pretendard max-w-md mx-auto min-h-screen bg-[#F9FAFB]">
-      <div className="flex items-center space-x-2">
+    <main className="min-h-screen bg-[#F9FAFB] font-pretendard">
+      {/* ✅ Sticky Header */}
+      <div className="sticky top-0 z-10 bg-[#F9FAFB] border-b px-4 py-3 max-w-md mx-auto flex items-center space-x-2">
         <button onClick={() => router.back()}>
           <ChevronLeft className="w-6 h-6 text-gray-600" />
         </button>
         <h1 className="text-lg font-semibold">이전 대화</h1>
       </div>
 
-      {session.map((entry, i) => (
-        <div key={i}>
-          <ChatBubble role="user" content={entry.message} />
-          <ChatBubble role="bot" content={entry.answer} />
-        </div>
-      ))}
-    </div>
+      {/* ✅ 본문 채팅 내용 */}
+      <div className="max-w-md mx-auto px-4 pb-32 pt-4 space-y-4">
+        {session.map((entry, i) => (
+          <div key={i}>
+            <ChatBubble role="user" content={entry.message} />
+            <ChatBubble role="bot" content={entry.answer} />
+          </div>
+        ))}
+      </div>
+    </main>
   );
 }

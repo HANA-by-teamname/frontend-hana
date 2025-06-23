@@ -31,7 +31,7 @@ export default function SearchBar({ query, setQuery, onSearchConfirm, onFocus }:
         className="w-full px-5 py-3 pl-10 rounded-full border border-gray-300 text-sm focus:outline-none focus:ring-2 focus:ring-sky-300 bg-white"
       />
       <Image
-        src="/icons/Search.svg"
+        src="/icons/Dotbogi.svg"
         alt="검색"
         width={16}
         height={16}
